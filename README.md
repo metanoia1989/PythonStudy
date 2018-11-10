@@ -1,6 +1,14 @@
 我需要Python，我需要一門簡單優雅的語言，解放我的雙手，解放我的頭腦。
 我学习的第一门语言就是PHP，我对PHP的怨念深刻，PHP让我找到了人生第一份工作，但是没有让我感受到编程之美。
 
+# Python book
+- [廖雪峰 Python3 零起点教程](https://www.kancloud.cn/thinkphp/python-guide)
+- [Python3 CookBook中文版](https://www.kancloud.cn/kancloud/python3-cookbook) 新的python cookbook 很多应用实例 
+- [Python 菜谱](https://www.kancloud.cn/thinkphp/python-cookbook) 14 个python实例代码
+- [The Linux Command Line 中文版](https://www.kancloud.cn/thinkphp/linux-command-line) 学习Linux shell超棒的书
+- [Think Python 2e 中文版](https://www.kancloud.cn/wizardforcel/think-python-2e)
+- [Violent Python 中文版](https://www.kancloud.cn/wizardforcel/violent-python)
+
 # Python 代码 DEMO
 - [Python demo](https://github.com/mgss/python-demo)
 - [Python 开源库及示例代码](https://github.com/programthink/opensource/blob/master/libs/python.wiki)
