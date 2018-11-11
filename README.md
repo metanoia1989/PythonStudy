@@ -8,6 +8,8 @@
 - [The Linux Command Line 中文版](https://www.kancloud.cn/thinkphp/linux-command-line) 学习Linux shell超棒的书
 - [Think Python 2e 中文版](https://www.kancloud.cn/wizardforcel/think-python-2e)
 - [Violent Python 中文版](https://www.kancloud.cn/wizardforcel/violent-python)
+- [asyncio —— 异步I/O、事件循环、协程和任务](https://docs.python.org/3/library/asyncio.html)
+- [Python最佳实践指南](https://pythonguidecn.readthedocs.io/zh/latest/)
 
 # Python 代码 DEMO
 - [Python demo](https://github.com/mgss/python-demo)
