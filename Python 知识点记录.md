@@ -915,3 +915,28 @@ conn.close()
 $ sqlite3 dbname.db
 sqlite> .tables
 ```
+
+# MySQL Python
+安装 mysql 客户端：`pip install mysqlclient`  
+报错 `OSError: mysql_config not found`  
+首先系统要安装有mysql服务，其次要安装含有 mysql_config 的包  
+mysql_config是mariadb-devel或者mysql-devel包的一部分，mariadb-devel包是mariadb的链接库和头文件，不是mariadb的开发版本。链接库和头文件的版本需要和你安装的数据库版本相符。在使用链接库的情况下，不推荐使用SCL源安装MariaDB / MySQL。
+```sh
+# Debian
+$ apt install -y libmariadbclient-dev # mariadb
+$ apt install -y libmysqlclient-dev # mysql
+# Centos
+$ sudo yum install mariadb-devel
+$ sudo yum install mysql-devel
+```
+[CentOS7使用pip安装mysqlclient提示mysql_config not found](https://www.yuzhi100.com/article/cnetos-7-pip-mysqlclient-mysqlconfig-not-found)
+
+
+`MySQLdb.connection(host, user, passwd, db)` 获取数据库连接对象
+`Connection.cursor()` 返回游标对象，用来进行增删改查操作  
+`Cursor.execute()` 执行SQL语句，第二参数是传入的值组成的元组  
+`Cursor.fetchall()` 获取查询的数据集
+`Cursor.fetchone()` 获取查询的一条数据
+`Cursor.close()` 关闭游标
+`Connection.commit()` 提交改变  
+`Connection.close()` 关闭连接  
