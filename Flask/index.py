@@ -7,19 +7,50 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from datetime import datetime
 
+from flask_sqlalchemy import SQLAlchemy
+import os.path
+
 from flask_wtf import Form 
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'metanoia1989'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
+db = SQLAlchemy(app)
+manager = Manager(app)
+Bootstrap = Bootstrap(app)
+Moment = Moment(app)
 
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required()])
     submit = SubmitField('Submit')
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'metanoia1989'
-manager = Manager(app)
-Bootstrap = Bootstrap(app)
-Moment = Moment(app)
+class Role(db.Model):
+    """ Role 表模型 """
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    users = db.relationship('User', backref='role')
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+class User(db.Model):
+    """ User表模型 """
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    def __repr__(self):
+        return '<User %r>' % self.name
+
 
 @app.route('/')
 def index():
@@ -42,12 +73,19 @@ def make_form():
     name = None
     form = NameForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('你好像改变了你的名字！')
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            session['known'] = False
+        else:
+            session['known'] = True
         session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('make_form'))
-    return render_template('form.html', form=form, name=session.get('name'))
+    return render_template('form.html', form=form, 
+        name=session.get('name'),
+        known=session.get('known', False))
 
 
 if __name__ == '__main__':
