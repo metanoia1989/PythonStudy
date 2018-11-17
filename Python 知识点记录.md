@@ -940,3 +940,15 @@ $ sudo yum install mysql-devel
 `Cursor.close()` 关闭游标
 `Connection.commit()` 提交改变  
 `Connection.close()` 关闭连接  
+
+
+
+# 虚拟环境 pyvenv
+Python 3.3 通过 venv 模块原生支持虚拟环境，命令为 pyvenv。pyvenv 可以替 代 virtualenv。不过要注意，在 Python 3.3 中使用 pyvenv 命令创建的虚拟环 境不包含 pip，你需要进行手动安装。Python 3.4 改进了这一缺陷，pyvenv 完 全可以代替 virtualenv。   
+
+```sh
+$ cd flasky
+$ virtualenv venv
+$ source venv/bin/activate
+(venv) $ deactivate
+```
