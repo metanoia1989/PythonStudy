@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>Hello, {% if name %}{{ name }}{% else %}Stranger{% endif %}</h1>
+    </div>
+    <h1>form类自带渲染机制</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }} {{ form.name() }}
+        {{ form.submit() }}
+    </form>
+    <h1>Flask-Bootstrap 的预定义表单样式</h1>
+    {{ wtf.quick_form(form) }}
+{% endblock page_content %}

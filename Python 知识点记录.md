@@ -952,3 +952,20 @@ $ virtualenv venv
 $ source venv/bin/activate
 (venv) $ deactivate
 ```
+
+# python 查看已安装的模块
+- [查看python已安装模块的方法小结](https://blog.csdn.net/healthy_coder/article/details/50546384)
+
+虚拟开发环境的好处在于，python的安装扩展会最简单化，列出的模块都是当前项目所需要的。  
+如果是系统环境，就会在各种开发过程中，不断地装扩展，列出的数量也会很多，没有办法列出需要的。  
+
+**使用 pydoc 命令**: `$ pydoc modules`
+**交互解释器使用 help()**: `>>> help("modules")`
+**使用pip查看**: `$ pip freeze` `$ pip list`
+**使用yolk**: 这个不兼容 python3
+```shell
+$ yolk -l    #列出所有安装模块
+$ yolk -a    #列出激活的模块
+$ yolk -n    #列出非激活模块
+$ yolk -U [packagename]  # 通过查询pypi来查看（该）模块是否有新版本
+```
