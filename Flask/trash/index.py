@@ -43,7 +43,7 @@ Bootstrap = Bootstrap(app)
 Moment = Moment(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
-logging.basicConfig(filename='./log/logger.log', level=logging.INFO)
+logging.basicConfig(filename='../log/logger.log', level=logging.INFO)
 
 # 集成 Python shell
 def make_shell_context():
