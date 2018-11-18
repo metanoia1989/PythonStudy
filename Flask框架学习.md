@@ -399,13 +399,13 @@ static 文件夹中使用子文件夹存放文件。服务器收到前面那个 
 如果 Web 程序的用户来自世界各地，那么处理日期和时间可不是一个简单的任务。  
 服务器需要统一时间单位，这和用户所在的地理位置无关，所以一般使用协调世界时（Coordinated Universal Time，UTC）。  
 在服务器上只使用 UTC 时间，而用户需要看到当地时间，而且采用当地惯用的格式。   
-把时间单位发送给 Web 浏览器，转换成当地时间，然后渲染。Web 浏览器可以更好地完成这一任务，因为它能获取用户电脑中的时区和区域设置。 
-前端的库  [moment.js](http://momentjs.com/) 可以在浏览器中渲染日期和时间。
-Flask-Moment 是一个 Flask 程序扩展，能把 moment.js 集成到 Jinja2 模板中。
-momentJs文档: <http://momentjs.com/docs/#/displaying/>  
-Flask-Moment地址: <https://github.com/miguelgrinberg/Flask-Moment>  
+把时间单位发送给 Web 浏览器，转换成当地时间，然后渲染。Web 浏览器可以更好地完成这一任务，因为它能获取用户电脑中的时区和区域设置。   
+前端的库  [moment.js](http://momentjs.com/) 可以在浏览器中渲染日期和时间。  
+Flask-Moment 是一个 Flask 程序扩展，能把 moment.js 集成到 Jinja2 模板中。   
+momentJs文档: <http://momentjs.com/docs/#/displaying/>    
+Flask-Moment地址: <https://github.com/miguelgrinberg/Flask-Moment>    
 
-安装 Flask-Moment: `$ pip install flask-moment`
+安装 Flask-Moment: `$ pip install flask-moment`   
 初始化 Flask-Moment:
 ```python
 from flask_moment import Moment
@@ -604,4 +604,281 @@ def index():
     {% block page_content %}{% endblock %}
 </div>
 {% endblock %}
+```
+
+# 数据库
+数据库按照一定规则保存程序数据，程序再发起查询取回所需的数据。  
+Web 程序最常用基于关系模型的数据库，这种数据库也称为 SQL 数据库，因为它们使用结构化查询语言。  
+不过最近几年文档数据库和键值对数据库成了流行的替代选择，这两种数据库合称 NoSQL数据库。  
+
+各种类型的数据库包:  MySQL、Postgres、SQLite、 Redis、MongoDB 或者 CouchDB。     
+数据库抽象层代码包:   SQLAlchemy 和 MongoEngine。  
+用这些抽象包直接处理高等级的 Python 对象，而不用处理如表、文档或查询语言此类的数据库实体。  
+
+抽象层，也称为对象关系映射（Object-Relational Mapper，ORM）或对象文档映射（Object-Document Mapper，ODM），在用户不知觉的情况下把高层的面向对象操作转换成低层的数据库指令。  
+ORM 和 ODM 把对象业务转换成数据库业务会有一定的损耗。大多数情况下，这种性能的降低微不足道，但也不一定都是如此。一般情况下，ORM 和 ODM 对生产率的提升远远超过了这一丁点儿的性能降低，所以性能降低这个理由不足以说服用户完全放弃 ORM 和 ODM。   
+真正的关键点在于如何选择一个能直接操作低层数据库的抽象层，以防特定的操作需要直接使用数据库原生指令优化。  
+
+[SQLAlchemy ORM](http://www.sqlalchemy.org/) 就是一个很好的例子，它支持很多关系型数据库引擎，包括流行的 MySQL、Postgres 和 SQLite。  
+[Flask-SQLAlchemy](http://pythonhosted.org/Flask-SQLAlchemy/)  集成了 Flask 的框架可以简化配置和操作，节省你编写集成代码的时间。  
+
+
+## noSQL
+NoSQL 数据库一般使用集合代替表，使用文档代替记录。NoSQL 数据库采用的设计方式使联结变得困难，所以大多数数据库根本不支持这种操作。  
+这是执行反规范化操作得到的结果，它减少了表的数量，却增加了数据重复量。这种结构的数据库要把角色名存储在每个用户中。如此一来，将角色重命名的操作就变得很耗时，可能需要更新大量文档。使用 NoSQL 数据库当然也有好处。数据重复可以提升查询速度。列出用户及其角色的操作很简单，因为无需联结。    
+
+SQL 数据库擅于用高效且紧凑的形式存储结构化数据。这种数据库需要花费大量精力保证数据的一致性。NoSQL 数据库放宽了对这种一致性的要求，从而获得性能上的优势。对中小型程序来说，SQL 和 NoSQL 数据库都是很好的选择，而且性能相当。  
+
+
+## Flask-SQLAlchemy 
+Flask-SQLAlchemy 是一个 Flask 扩展，简化了在 Flask 程序中使用 SQLAlchemy 的操作。  
+SQLAlchemy 是一个很强大的关系型数据库框架，支持多种数据库后台。SQLAlchemy 提供了高层 ORM，也提供了使用数据库原生 SQL 的低层功能。  
+Flask-SQLAlchemy 也使用 pip 安装: `$ pip install flask-sqlalchemy`   
+在 Flask-SQLAlchemy 中，数据库使用 URL 指定。
+**FLask-SQLAlchemy数据库URL**
+```python
+MySQL mysql://username:password@hostname/database
+Postgres postgresql://username:password@hostname/database
+SQLite（Unix） sqlite:////absolute/path/to/database
+SQLite（Windows） sqlite:///c:/absolute/path/to/database
+```
+hostname 表示 MySQL 服务所在的主机  
+database 表示要使用的数据库名  
+username 和 password 表示数据库用户密令  
+
+SQLite 数据库不需要使用服务器，因此不用指定 hostname、username 和 password。URL 中的 database 是硬盘上文件的文件名。  
+
+程序使用的数据库 URL 必须保存到 Flask 配置对象的 `SQLALCHEMY_DATABASE_URI` 键中。  
+配置对象中还有一个很有用的选项，即 `SQLALCHEMY_COMMIT_ON_TEARDOWN` 键，将其设为 True 时，每次请求结束后都会自动提交数据库中的变动。
+```python
+from flask_sqlalchemy import SQLAlchemy
+basedir = os.path.abspath(os.path.dirname(__file__))
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] =\
+'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+# db 对象是 SQLAlchemy 类的实例，表示程序使用的数据库，同时还获得了 Flask-SQLAlchemy 提供的所有功能。
+db = SQLAlchemy(app)
+```
+
+## 定义模型
+模型这个术语表示程序使用的持久化实体。在 ORM 中，模型一般是一个 Python 类，类中的属性对应数据库表中的列。  
+Flask-SQLAlchemy 创建的数据库实例为模型提供了一个基类以及一系列辅助类和辅助函数，可用于定义模型的结构。  
+Flask-SQLAlchemy 要求每个模型都要定义 主键 ，这一列经常命名为 id 。  
+类变量 `__tablename__` 定义在数据库中使用的表名，其余的类变量都是该模型的属性，被定义为 db.Column 类的实例。  
+db.Column 类构造函数的第一个参数是数据库列和模型属性的类型。  
+两个模型都定义了 `__repr()__` 方法，返回一个具有可读性的字符串表示模型，可在调试和测试时使用。   
+```python
+class Role(db.Model):
+    """ Role 表模型 """
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
+
+class User(db.Model):
+    """ User表模型 """
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True)
+
+    def __repr__(self):
+        return '<User %r>' % self.name
+```
+**最常用的SQLAlchemy列类型**
+```python
+Integer int 普通整数，一般是 32 位
+SmallInteger int 取值范围小的整数，一般是 16 位
+BigInteger int 或 long 不限制精度的整数
+Float float 浮点数
+Numeric decimal.Decimal 定点数
+String str 变长字符串
+Text str 变长字符串，对较长或不限长度的字符串做了优化
+Unicode unicode 变长 Unicode 字符串
+UnicodeText unicode 变长 Unicode 字符串，对较长或不限长度的字符串做了优化
+Boolean bool 布尔值
+Date datetime.date 日期
+Time datetime.time 时间
+DateTime datetime.datetime 日期和时间
+Interval datetime.timedelta 时间间隔
+Enum str 一组字符串
+PickleType 任何 Python 对象 自动使用 Pickle 序列化
+LargeBinary str 二进制文件
+```
+**db.Column 中其余的参数指定属性的配置选项**
+```python
+primary_key 如果设为 True ，这列就是表的主键
+unique 如果设为 True ，这列不允许出现重复的值
+index 如果设为 True ，为这列创建索引，提升查询效率
+nullable 如果设为 True ，这列允许使用空值；如果设为 False ，这列不允许使用空值
+default 为这列定义默认值
+```
+
+## 模型关联
+关系型数据库使用关系把不同表中的行联系起来，如角色到用户的一对多关系，因为一个角色可属于多个用户，而每个用户都只能有一个角色。  
+关系使用 users 表中的外键连接了两行。添加到 User 模型中的 `role_id` 列被定义为外键，就是这个外键建立起了关系。传给 `db.ForeignKey()` 的参数 'roles.id' 表明，这列的值是 roles 表中行的 id 值。   
+`db.relationship()` 的第一个参数表明这个关系的另一端是哪个模型。 backref 参数向 User 模型中添加一个 role 属性，从而定义反向关系。这一属性可替代 role_id 访问 Role 模型，此时获取的是模型对象，而不是外键的值。
+
+> 这种关联一般都是 ORM 的难点。
+
+```python
+class Role(db.Model):
+    # ...
+    users = db.relationship('User', backref='role')
+class User(db.Model):
+    # ...
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+```
+
+**常用的SQLAlchemy关系选项**
+```python
+backref 在关系的另一个模型中添加反向引用
+primaryjoin 明确指定两个模型之间使用的联结条件。只在模棱两可的关系中需要指定
+lazy 指定如何加载相关记录。
+> 可选值有 select （首次访问时按需加载）、 
+> immediate （源对象加载后就加载）、 
+> joined （加载记录，但使用联结）、 
+> subquery （立即加载，但使用子查询）， 
+> noload （永不加载）和 dynamic （不加载记录，但提供加载记录的查询）
+uselist 如果设为 Fales ，不使用列表，而使用标量值
+order_by 指定关系中记录的排序方式
+secondary 指定多对多关系中关系表的名字
+secondaryjoin SQLAlchemy 无法自行决定时，指定多对多关系中的二级联结条件
+```
+
+## 数据库操作
+数据库会话也称为事务，通过数据库会话管理对数据库所做的改动，在 Flask-SQLAlchemy 中，会话由 db.session
+表示。准备把对象写入数据库之前，先要将其添加到会话中。      
+把对象添加到会话：db.session.add()      
+添加多个对象到会话：db.session.add_all()        
+提交会话：db.session.commit()       
+回滚操作： db.session.rollback()
+
+数据库会话能保证数据库的一致性。提交操作使用原子方式把会话中的对象全部写入数据库。如果在写入会话的过程中发生了错误，整个会话都会失效。如果你始终把相关改动放在会话中提交，就能避免因部分更新导致的数据库不一致性。  
+数据库会话也可以回滚，回滚之后添加到数据库会话中的所有对象都会还原到它们在数据库时的状态。      
+
+修改行：db.session.add() 方法 
+删除行：db.seesion.delete() 方法
+```python
+# 更新
+>>> admin_role.name = 'Administrator'
+>>> db.session.add(admin_role)
+>>> db.session.commit()
+# 删除
+>>> db.session.delete(mod_role)
+>>> db.session.commit()
+```
+
+Flask-SQLAlchemy 为每个模型类都提供了 query 对象: `Role.query.all()`
+使用过滤器可以配置 query 对象进行更精确的数据库查询: `User.query.filter_by(role=user_role).all()`
+查看 SQLAlchemy 为查询生成的原生 SQL 查询语句，把 query 对象转换成字符串: `str(User.query.filter_by(role=user_role))`
+
+**常用的SQLAlchemy查询过滤器**
+```python
+filter() 把过滤器添加到原查询上，返回一个新查询
+filter_by() 把等值过滤器添加到原查询上，返回一个新查询
+limit() 使用指定的值限制原查询返回的结果数量，返回一个新查询
+offset() 偏移原查询返回的结果，返回一个新查询
+order_by() 根据指定条件对原查询结果进行排序，返回一个新查询
+group_by() 根据指定条件对原查询结果进行分组，返回一个新查询
+```
+
+**最常使用的SQLAlchemy查询执行函数**
+```python
+all() 以列表形式返回查询的所有结果
+first() 返回查询的第一个结果，如果没有结果，则返回 None
+first_or_404() 返回查询的第一个结果，如果没有结果，则终止请求，返回 404 错误响应
+get() 返回指定主键对应的行，如果没有对应的行，则返回 None
+get_or_404() 返回指定主键对应的行，如果没找到指定的主键，则终止请求，返回 404 错误响应
+count() 返回查询结果的数量
+paginate() 返回一个 Paginate 对象，它包含指定范围内的结果
+```
+
+## 集成Python shell
+让 Flask-Script 的 shell 命令自动导入特定的对象，编程的乐趣就这里，一次编写，省很多事。     
+若想把对象添加到导入列表中，为 shell 命令注册一个 `make_context` 回调函数   
+```python
+from flask_script import Shell
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+manager.add_command("shell", Shell(make_context=make_shell_context))
+```
+make_shell_context() 函数注册了程序、数据库实例以及模型，因此这些对象能直接导入 shell   
+
+```python
+In [1]: app                                                                                               
+Out[1]: <Flask 'index'>
+In [2]: db                                                                                                
+Out[2]: <SQLAlchemy engine=sqlite:////home/smithadam/Code/python/Flask/data.sqlite>
+In [3]: User                                                                                              
+Out[3]: __main__.User
+In [4]: Role                                                                                              
+Out[4]: __main__.Role
+```
+
+## Flask-Migrate 数据库迁移
+更新表的更好方法是使用数据库迁移框架。源码版本控制工具可以跟踪源码文件的变化，类似地，数据库迁移框架能跟踪数据库模式的变化，然后增量式的把变化应用到数据库中。  
+SQLAlchemy 的主力开发人员编写了一个迁移框架，称为 [Alembic](https://alembic.readthedocs.org/en/latest/index.html)       
+[Flask-Migrate](http://flask-migrate.readthedocs.org/en/latest/)扩展对 Alembic 做了轻量级包装，并集成到 Flask-Script 中，所有操作都通过 Flask-Script 命令完成。     
+
+安装 Flask-Migrate: `$ pip install flask-migrate`
+配置 Flask-Migrate 初始化:
+```python
+from flask_migrate import Migrate, MigrateCommand
+# ...
+migrate = Migrate(app, db)
+manager.add_command('db', MigrateCommand)
+```
+为了导出数据库迁移命令，Flask-Migrate 提供了一个 MigrateCommand 类，可附加到 Flask-Script 的 manager 对象上。     
+
+**迁移初始化**
+初始化数据库迁移库：`$ python hello.py db init`     
+这个命令会创建 migrations 文件夹，所有迁移脚本都存放其中，数据库迁移仓库中的文件要和程序的其他文件一起纳入版本控制。  
+在 Alembic 中，数据库迁移用迁移脚本表示。脚本中有两个函数，分别是 upgrade() 和 downgrade() 。       
+upgrade() 函数把迁移中的改动应用到数据库中， downgrade() 函数则将改动删除。     
+
+Alembic 具有添加和删除改动的能力，因此数据库可重设到修改历史的任意一点。        
+
+使用 revision 命令手动创建 Alembic 迁移，也可使用 migrate 命令自动创建。 手动创建的迁移只是一个骨架， upgrade() 和 downgrade() 函数都是空的，开发者要使用 Alembic 提供的 Operations 对象指令实现具体操作。自动创建的迁移会根据模型定义和数据库当前状态之间的差异生成 upgrade() 和 downgrade() 函数的内容。
+
+migrate 子命令用来自动创建迁移脚本: `$ python hello.py db migrate -m "initial migration"`
+使用 db upgrade 命令把迁移应用到数据库中: `$ python hello.py db upgrade`
+
+# 电子邮件
+很多类型的应用程序都需要在特定事件发生时提醒用户，而常用的通信方法是电子邮件。      
+Python 标准库中的 smtplib 包可用在 Flask 程序中发送电子邮件，但包装了 smtplib 的 Flask-Mail 扩展能更好地和 Flask 集成。     
+
+Flask-Mail 安装：`$ pip install flask-mail`     
+Flask-Mail 连接到SMTP服务器，并把邮件交给这个服务器发送。如果不进行配置，Flask-Mail 会连接 localhost 上的端口 25，无需验证即可发送电子邮件。        
+**Flask-Mail SMTP服务器的配置**
+```python
+MAIL_SERVER localhost 电子邮件服务器的主机名或 IP 地址
+MAIL_PORT 25 电子邮件服务器的端口
+MAIL_USE_TLS False 启用传输层安全（Transport Layer Security，TLS）协议
+MAIL_USE_SSL False 启用安全套接层（Secure Sockets Layer，SSL）协议
+MAIL_USERNAME None 邮件账户的用户名
+MAIL_PASSWORD None 邮件账户的密码
+```
+
+配置 Flask-Mail 使用 Gmail
+```python
+import os
+# ...
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+```
+Flask-Mail扩展初始化:
+```python
+from flask.ext.mail import Mail
+mail = Mail(app)
+```
+保存电子邮件服务器用户名和密码的两个环境变量要在环境中定义:
+```sh
+$ export MAIL_USERNAME=<Gmail username>
+$ export MAIL_PASSWORD=<Gmail password>
 ```

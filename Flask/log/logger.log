@@ -1,0 +1,185 @@
+INFO:werkzeug: * Running on http://0.0.0.0:8888/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:46:11] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:46:11] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:46:12] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:47:54] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:47:54] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:47:54] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Running on http://0.0.0.0:8888/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:49:50] "GET / HTTP/1.1" 200 -
+INFO:root:发起一次请求
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:49:54] "GET /form HTTP/1.1" 200 -
+INFO:root:发起一次请求
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:05] "POST /form HTTP/1.1" 302 -
+INFO:root:发起一次请求
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:05] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:发起一次请求
+INFO:root:提交一次表单
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:47] "POST /form HTTP/1.1" 302 -
+INFO:root:发起一次请求
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:47] "GET /form HTTP/1.1" 200 -
+INFO:root:发起一次请求
+INFO:root:提交一次表单
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:57] "POST /form HTTP/1.1" 302 -
+INFO:root:发起一次请求
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:50:57] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:51:33] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:51:33] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:26] "POST /form HTTP/1.1" 500 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:26] "GET /form?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:26] "GET /form?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:26] "GET /form?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:26] "GET /form?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:27] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:27] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:None
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:54] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:54] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:55] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:None
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:58] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [17/Nov/2018 09:52:58] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Running on http://0.0.0.0:8888/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:30] "POST /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:30] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "POST /form HTTP/1.1" 500 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:48:33] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:49:14] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:49:14] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:49:14] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:50:06] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:50:07] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:50:19] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:50:19] "GET /form HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:18] "POST /form HTTP/1.1" 500 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:51:19] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:52:03] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:52:03] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:52:03] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:root:1.提交一次表单
+INFO:root:2.用户不存在
+INFO:root:sogaxili@gmail.com
+INFO:root:3.正确读取管理员邮箱
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:52:13] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:52:13] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:sogaxili@gmail.com
+INFO:root:adfads1241234
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:54:58] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:54:58] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:werkzeug: * Detected change in '/home/smithadam/Code/python/Flask/index.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 813-258-078
+INFO:root:sogaxili@gmail.com
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:56:28] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:56:29] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:04] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:05] "GET /static/flask.png HTTP/1.1" 200 -
+INFO:root:sogaxili@gmail.com
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "POST /form HTTP/1.1" 500 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:08] "GET /form?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:root:sogaxili@gmail.com
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:17] "POST /form HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:17] "GET /form HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.101 - - [18/Nov/2018 01:58:17] "GET /static/flask.png HTTP/1.1" 200 -

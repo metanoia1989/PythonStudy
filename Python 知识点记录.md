@@ -969,3 +969,21 @@ $ yolk -a    #列出激活的模块
 $ yolk -n    #列出非激活模块
 $ yolk -U [packagename]  # 通过查询pypi来查看（该）模块是否有新版本
 ```
+
+# loggin 日志记录模块
+- [python logging模块使用教程](https://www.jianshu.com/p/feb86c06c4f4)
+
+```python
+#!/usr/local/bin/python
+# -*- coding:utf-8 -*-
+import logging
+
+# 通过下面的方式进行简单配置输出方式与日志级别
+logging.basicConfig(filename='logger.log', level=logging.INFO)
+
+logging.debug('debug message')
+logging.info('info message')
+logging.warn('warn message')
+logging.error('error message')
+logging.critical('critical message')
+```
