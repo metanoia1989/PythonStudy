@@ -58,6 +58,59 @@ $ make
 $ make install
 ```
 
+# 虚拟环境 pyvenv
+Python 3.3 通过 venv 模块原生支持虚拟环境，命令为 pyvenv。pyvenv 可以替 代 virtualenv。不过要注意，在 Python 3.3 中使用 pyvenv 命令创建的虚拟环 境不包含 pip，你需要进行手动安装。Python 3.4 改进了这一缺陷，pyvenv 完 全可以代替 virtualenv。   
+
+```sh
+$ cd flasky
+$ virtualenv venv
+$ source venv/bin/activate
+(venv) $ deactivate
+```
+
+将虚拟机环境安装的模块写入文件：`$ pip freeze > requirements.txt`
+从依赖描述文件中安装模块: `$ pip install -r requirements.txt`
+
+## virtualenv OSError: [Errno 30] Read-only file system
+- [Virtualenv not creating an environment](https://stackoverflow.com/questions/11265091/virtualenv-not-creating-an-environment)
+- [Can't create symlinks in virtualbox shared folders [closed]](https://serverfault.com/questions/345341/cant-create-symlinks-in-virtualbox-shared-folders)
+
+好像是virtualbox 共享目录的bug      
+直接为专门的项目新建 venv 目录到其他非共享目录，用来生成  requirements.txt 文件     
+```python
+virtualenv ~/[my-env-name]
+source ~/[my-env-name]/bin/activate
+```
+
+Virtualenv is using symbolic links，Creating symbolic links in a VirtualBox shared folder is disabled.  
+开启共享目录的硬链接：
+```sh
+# 替换 VM_NAME 为虚拟机名，替换 NAME_OF_YOUR_SHARED_FOLDER 为共享目录名
+$ vboxmanage setextradata VM_NAME "VBoxInternal2/SharedFoldersEnableSymlinksCreate/NAME_OF_YOUR_SHARED_FOLDER" 1
+$ vboxmanage setextradata CentOS7 VBoxInternal2/SharedFoldersEnableSymlinksCreate/ShareDir 1
+# 重启虚拟机，然后检测设置是否生效
+$ vboxmanage getextradata VM_NAME enumerate
+```
+
+测试虚拟机共享文件夹是否能创建软链接: `ln -s testfile`
+
+# python 查看已安装的模块
+- [查看python已安装模块的方法小结](https://blog.csdn.net/healthy_coder/article/details/50546384)
+
+虚拟开发环境的好处在于，python的安装扩展会最简单化，列出的模块都是当前项目所需要的。  
+如果是系统环境，就会在各种开发过程中，不断地装扩展，列出的数量也会很多，没有办法列出需要的。  
+
+**使用 pydoc 命令**: `$ pydoc modules`
+**交互解释器使用 help()**: `>>> help("modules")`
+**使用pip查看**: `$ pip freeze` `$ pip list`
+**使用yolk**: 这个不兼容 python3
+```shell
+$ yolk -l    #列出所有安装模块
+$ yolk -a    #列出激活的模块
+$ yolk -n    #列出非激活模块
+$ yolk -U [packagename]  # 通过查询pypi来查看（该）模块是否有新版本
+```
+
 # Python 语句
 ## 多种赋值方式
 **序列解包**
@@ -943,32 +996,6 @@ $ sudo yum install mysql-devel
 
 
 
-# 虚拟环境 pyvenv
-Python 3.3 通过 venv 模块原生支持虚拟环境，命令为 pyvenv。pyvenv 可以替 代 virtualenv。不过要注意，在 Python 3.3 中使用 pyvenv 命令创建的虚拟环 境不包含 pip，你需要进行手动安装。Python 3.4 改进了这一缺陷，pyvenv 完 全可以代替 virtualenv。   
-
-```sh
-$ cd flasky
-$ virtualenv venv
-$ source venv/bin/activate
-(venv) $ deactivate
-```
-
-# python 查看已安装的模块
-- [查看python已安装模块的方法小结](https://blog.csdn.net/healthy_coder/article/details/50546384)
-
-虚拟开发环境的好处在于，python的安装扩展会最简单化，列出的模块都是当前项目所需要的。  
-如果是系统环境，就会在各种开发过程中，不断地装扩展，列出的数量也会很多，没有办法列出需要的。  
-
-**使用 pydoc 命令**: `$ pydoc modules`
-**交互解释器使用 help()**: `>>> help("modules")`
-**使用pip查看**: `$ pip freeze` `$ pip list`
-**使用yolk**: 这个不兼容 python3
-```shell
-$ yolk -l    #列出所有安装模块
-$ yolk -a    #列出激活的模块
-$ yolk -n    #列出非激活模块
-$ yolk -U [packagename]  # 通过查询pypi来查看（该）模块是否有新版本
-```
 
 # loggin 日志记录模块
 - [python logging模块使用教程](https://www.jianshu.com/p/feb86c06c4f4)

@@ -882,3 +882,125 @@ mail = Mail(app)
 $ export MAIL_USERNAME=<Gmail username>
 $ export MAIL_PASSWORD=<Gmail password>
 ```
+
+# 大型程序结构
+```
+|-app/
+    |-templates/
+    |-static/
+    |-main/
+        |-__init__.py
+        |-errors.py
+        |-forms.py
+        |-views.py
+    |-__init__.py
+    |-email.py
+    |-models.py
+|-migrations/
+|-tests/
+    |-__init__.py
+    |-test*.py
+|-venv/
+|-requirements.txt
+|-config.py
+|-manage.py
+```
+Flask 程序一般都保存在名为 app 的包中；     
+和之前一样，migrations 文件夹包含数据库迁移脚本；   
+单元测试编写在 tests 包中；     
+和之前一样，venv 文件夹包含 Python 虚拟环境。   
+requirements.txt 列出了所有依赖包，便于在其他电脑中重新生成相同的虚拟环境；     
+config.py 存储配置；    
+manage.py 用于启动程序以及其他的程序任务。      
+
+**配置**        
+序经常需要设定多个配置，开发、测试和生产环境要使用不同的数据库，这样才不会彼此影响。    
+基类 Config 中包含通用配置，子类分别定义专用的配置。如果需要，你还可添加其他配置类。    
+
+**程序包**      
+程序包用来保存程序的所有代码、模板和静态文件。我们可以把这个包直接称为 app（应用），如果有需求，也可使用一个程序专用名字。templates 和 static 文件夹是程序包的一部分，因此这两个文件夹被移到了 app 中。数据库模型和电子邮件支持函数也被移到了这个包中，分别保存为 app/models.py 和 app/email.py     
+
+## 使用程序工厂函数       
+构造文件导入了大多数正在使用的 Flask 扩展。由于尚未初始化所需的程序实例，所以没有初始化扩展，创建扩展类时没有向构造函数传入参数。 create_app() 函数就是程序的工厂函数，接受一个参数，是程序使用的配置名。   
+
+配置类在 config.py 文件中定义，其中保存的配置可以使用 Flask app.config 配置对象提供的 from_object() 方法直接导入程序。至于配置对象，则可以通过名字从 config 字典中选择。程序创建并配置好后，就能初始化扩展了。在之前创建的扩展对象上调用 init_app() 可以完成初始化过程。        
+```python
+bootstrap = Bootstrap()
+mail = Mail()
+moment = Moment()
+db = SQLAlchemy()
+def create_db(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
+
+    bootstrap.init_app(app)
+    mail.init_app(app)
+    moment.init_app(app)
+    db.init_app(app)
+    # 附加路由定义和错误页面
+    return app
+```
+现在工厂函数创建的程序还不完整，因为没有路由和自定义的错误页面处理程序。    
+
+## 在蓝本中实现程序功能        
+转换成程序工厂函数的操作让定义路由变复杂了。在单脚本程序中，程序实例存在于全局作用域中，路由可以直接使用 app.route 修饰器定义。但现在程序在运行时创建，只有调用 create_app() 之后才能使用 app.route 修饰器，这时定义路由就太晚了。和路由一样，自定义的错误页面处理程序也面临相同的困难，因为错误页面处理程序使用 app.errorhandler 修饰器定义。      
+> 不是很懂这个过程，先抄下来吧  
+
+蓝本和程序类似，也可以定义路由。不同的是，在蓝本中定义的路由处于休眠状态，直到蓝本注册到程序上后，路由才真正成为程序的一部分。使用位于全局作用域中的蓝本时，定义路由的方法几乎和单脚本程序一样。
+> 所以说蓝本其实是一种另类的路由，blueprint 什么破名字！        
+
+在蓝本中编写错误处理程序稍有不同，如果使用 errorhandler 修饰器，那么只有蓝本中的错误才能触发处理程序。要想注册程序全局的错误处理程序，必须使用 app_errorhandler 。  
+```python
+from flask import render_template
+from . import main
+@main.app_errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+@main.app_errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+```
+
+在蓝本中就不一样了，Flask 会为蓝本中的全部端点加上一个命名空间，这样就可以在不同的蓝本中使用相同的端点名定义视图函数，而不会产生冲突。命名空间就是蓝本的名字（ Blueprint 构造函数的第一个参数），所以视图函数 index() 注册的端点名是 main.index ，其 URL 使用 url_for('main.index') 获取。      
+
+url_for() 函数还支持一种简写的端点形式，在蓝本中可以省略蓝本名，例如 url_for('.index') 。在这种写法中，命名空间是当前请求所在的蓝本。这意味着同一蓝本中的重定向可以使用简写形式，但跨蓝本的重定向必须使用带有命名空间的端点名。     
+
+蓝本其实就是flask的一种模块化编程的方式，什么命名空间、路由注册，都是为这个服务的。什么破名字，取得真是太烂了，直接跟别人说这个，打死也不会明白这是什么东西。   
+
+## 单元测试
+Python 标准库中的 unittest 包编写。 setUp() 和 tearDown() 方法分别在各测试前后运行，并且名字以 test_ 开头的函数都作为测试执行。     
+```python
+import unittest
+from flask import current_app
+from app import create_app, db
+
+class BasicTestCase(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app('testing')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+    
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    def test_app_exists(self):
+        self.assertFalse(current_app is None)
+
+    def test_app_is_testing(self):
+        self.assertTrue(current_app.config['TESTING'])
+```
+
+manager.command 修饰器让自定义命令变得简单。修饰函数名就是命令名，函数的文档字符串会显示在帮助消息中。  
+添加自定义命令：
+```python
+@manager.command
+def test():
+    """Run the unit tests."""
+    import unittest
+    tests = unittest.TestLoader().discover('tests')
+    unittest.TextTestRunner(verbosity=2).run(tests)
+```
