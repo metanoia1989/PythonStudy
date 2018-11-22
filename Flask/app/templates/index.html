@@ -1,19 +1,24 @@
 {% extends 'base.html' %}
 {% block page_content %}
-    <h1>列子</h1> 
-    <p>
-        太古之事滅矣，孰誌之哉？
-        三皇之事若存若亡，五帝之事若覺若夢，三王之事或隱或顯，億不識一。
-        當身之事或聞或見，萬不識一。
-        目前之事或存或廢，千不識一。
-        太古至于今日，年數固不可勝紀。
-        但伏羲已來三十餘萬歲，賢愚、好醜，成敗、是非，無不消滅；
-        但遲速之間耳。
-        矜一時之毀譽，以焦苦其神形，
-        要死後數百年中餘名，
-        豈足潤枯骨？何生之樂哉？」
-    </p>
-    <p>当前时间：{{ moment(current_time).format('LLL') }}</p>
-    <p>相对时间：{{ moment(current_time).fromNow(refresh=True) }}</p>
+        
+    <div class="col-md-4">
+        {% if current_user.is_authenticated %}
+            {{ current_user.username}}
+        {% else %}
+            <p>
+                太古之事滅矣，孰誌之哉？
+                三皇之事若存若亡，五帝之事若覺若夢，三王之事或隱或顯，億不識一。
+                當身之事或聞或見，萬不識一。
+                目前之事或存或廢，千不識一。
+                太古至于今日，年數固不可勝紀。
+                但伏羲已來三十餘萬歲，賢愚、好醜，成敗、是非，無不消滅；
+                但遲速之間耳。
+                矜一時之毀譽，以焦苦其神形，
+                要死後數百年中餘名，
+                豈足潤枯骨？何生之樂哉？」
+            </p>
+        {% endif %}
+        <p>当前时间：{{ moment(current_time).format('LLL') }}</p>
+        <p>相对时间：{{ moment(current_time).fromNow(refresh=True) }}</p>
+    </div>
 {% endblock %}
-

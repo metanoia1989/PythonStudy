@@ -1,3 +1,4 @@
+[TOC]
 # 资源链接
 - [jinja模板引擎](http://jinja.pocoo.org/docs/2.10/)
 - [flask 框架文档](http://flask.pocoo.org/docs/1.0/)
@@ -204,6 +205,13 @@ def index():
 @app.route('/user/<name>')
 def user(name):
     return render_template('user.html', name=name)
+```
+
+## 注释
+```
+变量  {{ ... }}
+程序命令 {% ... %}
+注释 {# ... #} 
 ```
 
 ## 变量
@@ -1004,3 +1012,101 @@ def test():
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
 ```
+
+# 用户认证
+大多数程序都要进行用户跟踪。用户连接程序时会进行身份认证，通过这一过程，让程序知道自己的身份。程序知道用户是谁后，就能提供有针对性的体验。      
+最常用的认证方法要求用户提供一个身份证明（用户的电子邮件或用户名）和一个密码。  
+
+Flask的认证扩展:
+`Flask-Login`：管理已登录用户的用户会话       
+`Werkzeug`：计算密码散列值并进行核对      
+`itsdangerous`：生成并核对加密安全令牌    
+
+生成安全密码散列值 - [Salted Password Hashing - Doing it Right](https://crackstation.net/hashing-security.htm)  
+## Werkzeug实现密码散列    
+`generate_password_hash(password, method= • pbkdf2:sha1, salt_length=8)`        
+将原始密码作为输入，以字符串形式输出密码的散列值，输出的值可保存在用户数据库中。 
+method 和 salt_length 的默认值就能满足大多数需求。      
+
+`check_password_hash(hash, password)`       
+函数的参数是从数据库中取回的密码散列值和用户输入的密码。返回值为 True 表明密码正确。    
+
+## Flask-Login认证用户
+使用 Flask-Login 扩展，程序的 User 模型必须实现几个方法
+**Flask-Login要求实现的用户方法** 
+```table
+is_authenticated() 如果用户已经登录，必须返回 True ，否则返回 False
+is_active() 如果允许用户登录，必须返回 True ，否则返回 False 。如果要禁用账户，可以返回 False
+is_anonymous() 对普通用户必须返回 False
+get_id() 必须返回用户的唯一标识符，使用 Unicode 编码字符串
+```
+
+这 4 个方法可以在模型类中作为方法直接实现，不过还有一种更简单的替代方案。Flask-Login 提供了一个 UserMixin 类，其中包含这些方法的默认实现，且能满足大多数需求，只需繼承就可以。  
+```python
+from flask.ext.login import UserMixin
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key = True)
+    email = db.Column(db.String(64), unique=True, index=True)
+    username = db.Column(db.String(64), unique=True, index=True)
+    password_hash = db.Column(db.String(128))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+```
+
+> 在这个程序中，用户使用电子邮件地址登录，因为相对于用户名而言，用户更不容易忘记自己的电子邮件地址。（認同！）  
+
+LoginManager 对象的 session_protection 属性可以设为 None 、 'basic' 或 'strong' ，以提供不同的安全等级防止用户会话遭篡改。设为 'strong' 时，Flask-Login 会记录客户端 IP 地址和浏览器的用户代理信息，如果发现异动就登出用户。 login_view 属性设置登录页面的端点。回忆一下，登录路由在蓝本中定义，因此要在前面加上蓝本的名字。        
+
+为了保护路由只让认证用户访问，Flask-Login 提供了一个 login_required 修饰器。    
+如果未认证的用户访问这个路由，Flask-Login 会拦截请求，把用户发往登录页面。  
+```python
+from flask.ext.login import login_required
+@app.route('/secret')
+@login_required
+def secret():
+    return 'Only authenticated users are allowed!'
+```
+
+
+变量 current_user 由 Flask-Login 定义，且在视图函数和模板中自动可用。   
+这个变量的值是当前登录的用户，如果用户尚未登录，则是一个匿名用户代理对象。如果是匿名用户， is_authenticated 属性为 False 。
+
+当请求类型是 GET 时，视图函数直接渲染模板，即显示表单。当表单在 POST 请求中提交时， Flask-WTF 中的 `validate_on_submit()` 函数会验证表单数据，然后尝试登入用户。    
+
+视图函数首先使用表单中填写的 email 从数据库中加载用户。如果电子邮件地址对应的用户存在，再调用用户对象的 verify_password() 方法，其参数是表单中填写的密码。如果密码正确，则调用 Flask-Login 中的 login_user() 函数，在用户会话中把用户标记为已登录。 login_user() 函数的参数是要登录的用户，以及可选的“记住我”布尔值，“记住我”也在表单中填写。如果值为 False ，那么关闭浏览器后用户会话就过期了，所以下次用户访问时要重新登录。如果值为 True ，那么会在用户浏览器中写入一个长期有效的 cookie，使用这个 cookie 可以复现用户会话。         
+
+cookie 的作用就在这里，可以保持长期的会话。     
+
+### current_user.is_authenticated() TypeError: 'bool' object is not callable
+- [if current_user.is_authenticated(): TypeError: 'bool' object is not callable](https://github.com/dpgaspar/Flask-AppBuilder/issues/235)
+
+current_user.isauthenticated() 方法已被移除，改成属性了，难怪报错了。。。。晕倒。       
+```python
+{% if current_user.is_authenticated %}
+  Hi {{ current_user.name }}!
+{% endif %}
+```
+
+
+## itsdangerous 生成确认令牌
+确认邮件中最简单的确认链接是 <http://www.example.com/auth/confirm/<id>> 这种形式的 URL，其中 id 是数据库分配给用户的数字 id 。用户点击链接后，处理这个路由的视图函数就将收到的用户 id 作为参数进行确认，然后将用户状态更新为已确认。但这种实现方式显然不是很安全，只要用户能判断确认链接的格式，就可以随便指定 URL中的数字，从而确认任意账户。解决方法是把 URL 中的 id 换成将相同信息安全加密后得到的令牌。     
+
+Flask 使用加密的签名 cookie 保护用户会话，防止被篡改。这种安全的 cookie 使用 itsdangerous 包签名。同样的方法也可用于确认令牌上。        
+```python
+(venv) $ python manage.py shell
+>>> from manage import app
+>>> from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+用户认证 ｜ 91
+>>> s = Serializer(app.config['SECRET_KEY'], expires_in = 3600)
+>>> token = s.dumps({ 'confirm': 23 })
+>>> token
+'eyJhbGciOiJIUzI1NiIsImV4cCI6MTM4MTcxODU1OCwiaWF0IjoxMzgxNzE0OTU4fQ.ey ...'
+>>> data = s.loads(token)
+>>> data
+{u'confirm': 23}
+```
+itsdangerous 提供了多种生成令牌的方法。其中， TimedJSONWebSignatureSerializer 类生成具有过期时间的 JSON Web 签名（JSON Web Signatures，JWS）。这个类的构造函数接收的参数是一个密钥，在 Flask 程序中可使用 SECRET_KEY 设置。     
+
+dumps() 方法为指定的数据生成一个加密签名，然后再对数据和签名进行序列化，生成令牌字符串。 expires_in 参数设置令牌的过期时间，单位为秒。      
+
+为了解码令牌，序列化对象提供了 loads() 方法，其唯一的参数是令牌字符串。这个方法会检验签名和过期时间，如果通过，返回原始数据。如果提供给 loads() 方法的令牌不正确或过期了，则抛出异常。      

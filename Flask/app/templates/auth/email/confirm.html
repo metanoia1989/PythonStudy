@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>欢迎注册，请确认邮箱</title>
+</head>
+<body>
+    <h1>Dear {{user.username}},</h1>
+
+    <p>    Welcome to Flasky!</p>
+
+    <p>   To confirm your account please click on the follow link:</p>
+
+    <p>    {{ url_for('auth.confirm', token=token, _external=True)}}</p>
+        
+    <p>    Sincerely,</p>
+
+    <p>    The Flasky Team</p>
+
+    <p>    Note: replies to this email address are not monitored.</p>
+</body>
+</html>

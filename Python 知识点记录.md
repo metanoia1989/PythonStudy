@@ -35,6 +35,8 @@ http://pypi.douban.com/ 豆瓣
 http://pypi.hustunique.com/ 华中理工大学
 http://pypi.sdutlinux.org/ 山东理工大学
 http://pypi.mirrors.ustc.edu.cn/ 中国科学技术大学
+http://mirrors.tuna.tsinghua.edu.cn/pypi/simple  清华大学
+
 ```
 直接修改 pip 配置文件即可
 linux的文件在`~/.pip/pip.conf`，windows在 `%HOMEPATH%\pip\pip.ini`
@@ -47,6 +49,35 @@ index-url = http://pypi.douban.com/simple
 ```sh
 $ pip3 install <package>
 $ pip3 install --user <package> # user-level installs
+$ pip install -r requirements.txt # 从给定的文件 requirements.txt 安装
+$ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pycurl  # 从指定源安装包
+$ pip install pycurl==7.43.0.2 # 安装指定版本
+$ pip install -U pycurl # 将指定的软件包升级到最新的可用版本
+
+# 搜索
+$ pip search pycurl
+
+# 输出已安装包
+$ pip freeze > requirements.txt # 导出已安装的包
+$ pip freeze --all > requirements.txt # 导出已安装的所有包
+$ pip freeze | tee requirements.txt # 导出已安装的包（Linux）
+
+# 查看安装包信息
+$ pip show pycurl # 查看安装包信息
+$ pip show -f pycurl # 查看包包所有的文件信息
+
+# 管理本地和全局配置文件
+$ pip config list # 查看本地配置
+$ pip config edit # 编辑本地配置
+$ pip config get index-url # 获取本地 key 配置
+$ pip config set index-url https://pypi.tuna.tsinghua.edu.cn/simple # 设置本地配置
+$ pip config unset index-url # 删除本地 key 配置
+$ pip config --global list # 查看全局配置
+
+# 卸载包
+$ pip uninstall pycurl # 卸载包
+$ pip uninstall -y pycurl # 不询问直接卸载删除包
+$ pip uninstall -r requirements.txt # 从给定的文件 requirements.txt 卸载删除包。
 ```
 
 ## 报错
@@ -60,6 +91,12 @@ $ make install
 
 # 虚拟环境 pyvenv
 Python 3.3 通过 venv 模块原生支持虚拟环境，命令为 pyvenv。pyvenv 可以替 代 virtualenv。不过要注意，在 Python 3.3 中使用 pyvenv 命令创建的虚拟环 境不包含 pip，你需要进行手动安装。Python 3.4 改进了这一缺陷，pyvenv 完 全可以代替 virtualenv。   
+
+Python 3 内置了用于创建虚拟环境的 venv 模块，pyvenv命令即将废弃。
+```python3
+$ python3 -m venv venv
+```
+
 
 ```sh
 $ cd flasky
@@ -822,6 +859,18 @@ with语句实际上是很通用的结构，允许使用所谓的上下文管理�
 
 Python的异常可以通过try语句来检查，任何在try语句块里的代码都会被监测，检查有无异常产生，except会根据输入检查异常的类型，并执行except内的代码。
 
+## 异常类型
+- `AttributeError`	属性错误；经常是因为访问对象没有的属性导致
+- `IOError`	输入/输出异常；经常是因没有权限打开文件
+- `ImportError`	无法引入模块或包；经常是路径错误或名称错误
+- `IndentationError`	语法错误（的子类） ；经常是代码缩进有问题
+- `IndexError`	索引错误；经常是访问越界索引
+- `KeyError`	键值错误；经常是访问字典里不存在的键
+- `NameError`	名称错误；经常是访问没有定义的变量
+- `TypeError`	类型错误；经常是传入对象类型与要求的不符合
+- `ValueError`	期望值错误；经常是传入传入的值不合法
+- `ZeroDivisionError`	0除错误；在除法或者求余中第二个参数为0时引发
+
 ## 异常处理语句 
 try...excpet...else...finally
 except后面的两个参数: 错误的类型, Exception的实例.
@@ -1013,4 +1062,138 @@ logging.info('info message')
 logging.warn('warn message')
 logging.error('error message')
 logging.critical('critical message')
+```
+
+
+# 面向對象
+`dir()` 获得一个对象的所有属性和方法    
+`len()` 获取一个对象的长度      
+`hasattr()` 检测对象是否有某属性    
+`getattr()` 获取对象属性的值    
+`setattr()` 设置属性的值        
+`delattr()` 删除属性        
+
+## 静态方法、类方法、属性方法与普通方法
+**静态方法  @staticmethod**     
+通过 @staticmethod 装饰器即可把普通的方法变为一个静态方法。     
+普通方法在实例化后直接调用，并且在方法里可以通过 `self.`调用实例变量或类变量。    
+静态方法不可以访问实例变量或类变量的。      
+
+**类方法 @classmethod**     
+通过 @classmethod 装饰器即可把普通的方法变为一个类方法。    
+普通的方法：可以在实例化后直接调用，并且在方法里可以通过 self.调用实例变量或类变量。        
+类方法： 类方法只能访问类变量，不能访问实例变量。   
+
+**属性方法 @property**      
+通过 @property 装饰器即可把普通的方法变为一个属性方法。     
+属性方法在调用时和调用实例属性一样。    
+
+## 类中的特殊成员
+`__xxx__`这种方式的变量都有特殊的含义   
+`__class__`表示当前操作的对象的类是什么     
+`__call__`由对象后加括号触发的，即：对象() 或者 类()()      
+`__dict__`查看类或对象中的所有成员      
+`__doc__`表示类的描述信息       
+`__del__`析构方法，当对象在内存中被释放时，自动触发执行     
+`__init__`构造方法，通过类创建实例对象时，自动触发执行      
+`__module__`表示当前操作的对象在那个模块        
+`__name__`表示类名      
+`__getitem__`用于索引操作，表示获取数据     
+`__setitem__`用于索引操作，表示设置数据     
+`__delitem__`用于索引操作，表示删除数据     
+`__str__`在打印对象时，默认输出该方法的返回值       
+`__new__`类方法，在对象被创建的时候调用，负责创建一个实例对象       
+
+> `__new__`方法返回一个实例之后，会自动的调用`__init__`方法，对实例进行初始化。如果`__new__`方法不返回值，或者返回的不是实例，那么它就不会自动的去调用`__init__`方法，也就无法创建实例对象。      
+
+`__slots__`变量提供一个元组来限制实例对象可以绑定那些属性。     
+
+
+# 列表和字段的迭代
+**迭代列表的key**
+```python
+for i in range(len(list1)):
+    print(i, end=' ')
+```
+
+**迭代key和value**
+```python
+for i, v in enumerate(list1):
+    print(i,'=>',v)
+```
+
+**修改列表的起始值进行迭代**
+```python
+for i, v in enumerate(list1, 1):
+    print(i, '=>', v)
+```
+
+**对字典的迭代**
+```python
+for k in dict.keys():
+    print(k)
+
+for v in dict.values():
+    print(v)
+
+for (k,v) in dict.items():
+    print(k,':',v)
+
+for (k,v) in zip(dict.keys(),dict.values()):
+    print('%s:' %k,v)
+```
+
+# 字符串格式化 % 与 format
+## % 格式符方式
+```python
+%[(name)][flags][width][.precision]typecode
+(name) : 可选参数，用于显示指定 key。
+flags ：可选参数，对齐标志（需配合width使用）。
+width : 可选参数，占用宽度。
+.precision ：可选参数，小数点后保留的位数。
+typecode ： 必选参数，类型编码。
+```
+**其中flags对其标志**
+```python
++	右对齐
+-	左对齐
+空格	右对齐
+0	右对齐，用0填充空白处
+```
+**格式化标志符 类型编码**
+```
+s	将赋值对象的__str__方法的返回值显示，即：转换成字符串
+r	将赋值对象的__repr__方法的返回值显示，即：输入的原格式
+c	将赋值整数(0-1114111)转换成 unicode 对应的值（py27只支持0-255）显示或者将赋值字符直接显示
+o	将整数转换成八进制显示
+x	将整数转换成十六进制显示
+d	将整数、浮点数转换成十进制，只显示整数部分
+e	将整数、浮点数转换成科学计数法显示（小写e）
+E	将整数、浮点数转换成科学计数法显示（大写E）
+f	将整数、浮点数转换成浮点数（默认保留小数点后6位）显示
+F	将整数、浮点数转换成浮点数（默认保留小数点后6位）显示
+g	将整数、浮点数转换成浮点型或科学计数法（超过6位数用科学计数法）显示（小写e）
+G	将整数、浮点数转换成浮点型或科学计数法（超过6位数用科学计数法）显示（大写E）
+%	当字符串中存在格式化标志时，需要用 %%表示一个百分号
+```
+
+## format 方式
+```python
+[[fill]align][sign][#][width][,][.precision][type]
+fill ：可选参数，空白处填充的字符(配合 align 使用)
+align ：可选参数，对齐标识（需配合 width 使用）
+sign ：可选参数，有无符号数字
+#号 ：可选参数，对于二进制、八进制、十六进制，如果加上#号，会显示 0b/0o/0x，否则不显示
+width : 可选参数，占用宽度。
+，号： 可选参数，为数字添加分隔符，如：99,999,999
+.precision ：可选参数，小数点后保留的位数。
+type：可选参数，格式化类型
+```
+
+**align对其标志符**
+```
+<	内容左对齐
+>	内容右对齐(默认)
+＝	内容右对齐，只对数字类型有效。 (符号+填充物+数字）
+^	内容居中
 ```

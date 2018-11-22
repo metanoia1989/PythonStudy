@@ -26,6 +26,14 @@
 - [跟老司机学Python3](https://www.kancloud.cn/airvip/air20170809)
 - [Python 操作 MySQL 数据库](http://www.runoob.com/python/python-mysql.html)
 
+# api 开发
+- [Swagger/OpenAPI First framework for Python on top of Flask](https://github.com/zalando/connexion)
+- [Building and Documenting Python REST APIs With Flask and Connexion](https://realpython.com/flask-connexion-rest-api/)
+
+# flask
+- [Flask application configuration using an environment variable and YAML](https://gist.github.com/mattupstate/2046115)
+- [4 Ways to manage the configuration in Python](https://hackernoon.com/4-ways-to-manage-the-configuration-in-python-4623049e841b)
+
 # 官方文档 
 - [sqlite3 — DB-API 2.0 interface for SQLite databases](https://pysqlite.readthedocs.io/en/latest/sqlite3.html)
 
