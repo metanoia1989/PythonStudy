@@ -26,6 +26,7 @@
 - [跟老司机学Python3](https://www.kancloud.cn/airvip/air20170809)
 - [Python 操作 MySQL 数据库](http://www.runoob.com/python/python-mysql.html)
 - [【类型篇】Python相关的数百篇优秀文章帮你整理好了！](https://mp.weixin.qq.com/s?__biz=MzI5NDY1MjQzNA==&mid=2247487172&idx=1&sn=61285c5949876c54bf5d5777e0b64474&chksm=ec5ed1b9db2958afe85014443a4919e5c857569f88b5c69dda0d2b31571e8e6e8b41a00a27f7&scene=21#wechat_redirect)
+- [最全36种python设计模式](https://www.cnblogs.com/ydf0509/p/8527851.html)
 
 # api 开发
 - [Swagger/OpenAPI First framework for Python on top of Flask](https://github.com/zalando/connexion)
