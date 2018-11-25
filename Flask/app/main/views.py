@@ -2,20 +2,29 @@
 # -*- conding:utf8 -*-
 
 from datetime import datetime
-from flask import render_template, session, redirect, url_for, flash 
+from flask import render_template, session, redirect, url_for, flash , request, current_app
 from flask_login import login_required, current_user
 from ..decorators import admin_required, permission_required
-from ..models import Permission, Role
-from .forms import EditProfileForm, EditProfileAdminForm
+from ..models import Permission, Role, Post
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from .. import db
 
 from . import main
 from .forms import NameForm
 from ..models import User
 
+import logging
+
+# 博客首页
 @main.route('/')
 def index():
-    return render_template('index.html', current_time=datetime.utcnow())
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False
+    )
+    posts = pagination.items
+    return render_template('index.html', posts=posts, pagination=pagination,current_time=datetime.utcnow())
 
 # 用户资料页面
 @main.route('/user/<username>')
@@ -23,7 +32,8 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    return render_template('user.html', user=user)
+    posts = user.posts.order_by(Post.timestamp.desc()).all()
+    return render_template('user.html', user=user, posts=posts)
 
 # 用户级别资料编辑页面
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -114,3 +124,22 @@ def for_admin_only():
 def for_medorators_only():
     return "For comment moderators!"
 
+# 添加文章
+@main.route('/add-post', methods=['GET', 'POST'])
+@login_required
+def add_post():
+    # logging.basicConfig(filename='../../log/logger.log', level=logging.INFO)
+    # logging.info(Permission.WRITE_ARTICLES)
+    # logging.info(current_user.role.permissions)
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, body=form.body.data, author=current_user._get_current_object())
+        db.session.add(post)
+        flash('添加文章成功')
+        return redirect(url_for('.index'))
+
+    if current_user.can(Permission.WRITE_ARTICLES): 
+        return render_template('add_post.html', form=form)
+    else:
+        return redirect(url_for('.page_not_found'))
+    

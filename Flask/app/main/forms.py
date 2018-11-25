@@ -45,3 +45,10 @@ class EditProfileAdminForm(Form):
         if field.data != self.user.username and \
                 User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already registered.')
+
+
+# 文章表单
+class PostForm(Form):
+    title = StringField("标题", validators=[Required(), Length(1, 128)])
+    body = TextAreaField("内容", validators=[Required()])
+    submit = SubmitField('添加')

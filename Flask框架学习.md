@@ -1142,3 +1142,56 @@ dumps() 方法为指定的数据生成一个加密签名，然后再对数据和
 ## before_request before_app_request
 对蓝本来说， before_request 钩子只能应用到属于蓝本的请求上。若想在蓝本中使用针对程序全局请求的钩子，必须使用 before_app_request 修饰器。        
 如果 before_request 或 before_app_request 的回调返回响应或重定向，Flask 会直接将其发送至客户端，而不会调用请求的视图函数。因此，这些回调可在必要时拦截请求。    
+
+
+## Gravatar 用户头像
+Gravatar 是一个行业领先的头像服务，能把头像和电子邮件地址关联起来。用户先要到 http://gravatar.com 中注册账户，然后上传图片。生成头像的 URL 时，要计算电子邮件地址的 MD5 散列值，生 成 的 头 像 URL 是 在 http://www.gravatar.com/avatar/ 或 https://secure.gravatar.com/avatar/ 之后加上这个 MD5 散列值。   
+python 生成md5值: `hashlib.md5(str.encode('utf-8')).hexdigest()`
+
+如果这个电子邮件地址没有对应的头像，则会显示一个默认图片。头像 URL 的查询字符串中可以包含多个参数以配置头像图片的特征。 
+Gravatar查询字符串参数
+```
+s 图片大小，单位为像素
+r 图片级别。可选值有 "g" 、 "pg" 、 "r" 和 "x"
+d 没有注册 Gravatar 服务的用户使用的默认图片生成方式。可选值有： "404" ，返回 404 错误；默
+认图片的 URL；图片生成器 "mm" 、 "identicon" 、 "monsterid" 、 "wavatar" 、 "retro" 或 "blank"
+之一
+fd 强制使用默认头像
+```
+
+# forgerypy 创建虚拟数据
+有多个 Python 包可用于生成虚拟信息，其中功能相对完善的是 ForgeryPy  
+
+ForgeryPy 并不是这个程序的依赖，因为它只在开发过程中使用。为了区分生产环境的依赖和开发环境的依赖，我们可以把文件 requirements.txt 换成 requirements 文件夹，它们分别保存不同环境中的依赖。  
+
+# Flask-SQLAlchemy
+## 分页 
+paginate() 方法的返回值是一个 Pagination 类对象，这个类在 Flask-SQLAlchemy 中定义。这个对象包含很多属性，用于在模板中生成分页链接，因此将其作为参数传入了模板。 
+**Flask-SQLAlchemy分页对象的属性**
+```python
+items 当前页面中的记录
+query 分页的源查询
+page 当前页数
+prev_num 上一页的页数
+next_num 下一页的页数
+has_next 如果有下一页，返回 True
+has_prev 如果有上一页，返回 True
+pages 查询得到的总页数
+per_page 每页显示的记录数量
+total 查询返回的记录总数
+```
+**在Flask-SQLAlchemy分页对象上可调用的方法**
+```python
+iter_pages (left_edge=2, left_current=2, right_current=5, right_edge=2)
+一个迭代器，返回一个在分页导航中显示的页数列表。
+这个列表的最左边显示 left_ edge 页，
+当前页的左边显示 left_current 页，
+当前页的右边显示 right_current 页，
+最右边显示 right_edge 页。
+例如，在一个 100 页的列表中，当前页为第 50 页，
+使用 默认配置，这个方法会返回以下页数：
+1、2、 None 、48、49、50、51、52、53、54、 55、 None 、99、100。 
+None 表示页数之间的间隔
+prev() 上一页的分页对象
+next() 下一页的分页对象
+```
