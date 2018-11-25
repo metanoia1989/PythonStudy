@@ -1087,6 +1087,7 @@ logging.critical('critical message')
 **属性方法 @property**      
 通过 @property 装饰器即可把普通的方法变为一个属性方法。     
 属性方法在调用时和调用实例属性一样。    
+followed_posts() 方法定义为属性，因此调用时无需加 () 。
 
 ## 类中的特殊成员
 `__xxx__`这种方式的变量都有特殊的含义   
