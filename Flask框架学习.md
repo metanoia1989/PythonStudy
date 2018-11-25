@@ -1195,3 +1195,38 @@ None 表示页数之间的间隔
 prev() 上一页的分页对象
 next() 下一页的分页对象
 ```
+
+app/templates/_macros.html：分页模板宏
+```html
+```
+
+# Markdown Flask-PageDown 富文本
+PageDown：使用 JavaScript 实现的客户端 Markdown 到 HTML 的转换程序。
+Flask-PageDown：为 Flask 包装的 PageDown，把 PageDown 集成到 Flask-WTF 表单中。
+Markdown：使用 Python 实现的服务器端 Markdown 到 HTML 的转换程序。
+Bleach：使用 Python 实现的 HTML 清理器。
+
+
+**使用Flask-PageDown**
+Flask-PageDown 扩展定义了一个 PageDownField 类，这个类和 WTForms 中的 TextAreaField 接口一致。  
+使用 PageDownField 字段之前，先要初始化扩展：
+```python
+from flask_pagedown import PageDown
+# ...
+pagedown = PageDown()
+# ...
+def create_app(config_name):
+    # ...
+    pagedown.init_app(app)
+    # ...
+```
+
+更换表单对象的文本域控件：
+```python
+from flask_pagedown.fields import PageDownField
+class PostForm(Form):
+    body = PageDownField("What's on your mind?", validators=[Required()])
+    submit = SubmitField('Submit')
+```
+
+Markdown 预览使用 PageDown 库生成，因此要在模板中修改。Flask-PageDown 简化了这个过程，提供了一个模板宏，从 CDN 中加载所需文件。     

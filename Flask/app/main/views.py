@@ -2,12 +2,12 @@
 # -*- conding:utf8 -*-
 
 from datetime import datetime
-from flask import render_template, session, redirect, url_for, flash , request, current_app
+from flask import render_template, session, redirect, url_for, flash , request, current_app, abort
 from flask_login import login_required, current_user
 from ..decorators import admin_required, permission_required
 from ..models import Permission, Role, Post
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm
-from .. import db
+from .. import db, pagedown
 
 from . import main
 from .forms import NameForm
@@ -32,8 +32,13 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    posts = user.posts.order_by(Post.timestamp.desc()).all()
-    return render_template('user.html', user=user, posts=posts)
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False
+    )
+    posts = pagination.items
+    return render_template('user.html', user=user, posts=posts, pagination=pagination)
 
 # 用户级别资料编辑页面
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -128,9 +133,6 @@ def for_medorators_only():
 @main.route('/add-post', methods=['GET', 'POST'])
 @login_required
 def add_post():
-    # logging.basicConfig(filename='../../log/logger.log', level=logging.INFO)
-    # logging.info(Permission.WRITE_ARTICLES)
-    # logging.info(current_user.role.permissions)
     form = PostForm()
     if form.validate_on_submit():
         post = Post(title=form.title.data, body=form.body.data, author=current_user._get_current_object())
@@ -143,3 +145,27 @@ def add_post():
     else:
         return redirect(url_for('.page_not_found'))
     
+@main.route('/post/<int:id>')
+@login_required
+def post(id):
+    post = Post.query.get_or_404(id)
+    return render_template('post.html',  post=post)
+
+# 编辑文章
+@main.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit(id):
+    post = Post.query.get_or_404(id)
+    if current_user != post.author and \
+            not current_user.can(Permission.ADMINISTER):
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.body = form.body.data
+        db.session.add(post)
+        flash('更新文章成功')
+        return redirect(url_for('.post', id=post.id))
+    form.title.data = post.title
+    form.body.data = post.body
+    return render_template('edit_post.html', form=form)

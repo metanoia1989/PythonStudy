@@ -6,6 +6,7 @@ from wtforms import StringField, SubmitField, TextAreaField, BooleanField, Selec
 from wtforms.validators import Required, Length, Email, Regexp
 from wtforms import ValidationError
 from ..models import User, Role
+from flask_pagedown.fields import PageDownField
 
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required()])
@@ -50,5 +51,5 @@ class EditProfileAdminForm(Form):
 # 文章表单
 class PostForm(Form):
     title = StringField("标题", validators=[Required(), Length(1, 128)])
-    body = TextAreaField("内容", validators=[Required()])
+    body = PageDownField("内容", validators=[Required()])
     submit = SubmitField('添加')
