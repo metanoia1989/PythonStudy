@@ -35,6 +35,9 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
+## cookie
+set_cookie() 函数的前两个参数分别是 cookie 名和值。可选的 max_age 参数设置 cookie 的过期时间，单位为秒。如果不指定参数 max_age ，浏览器关闭后 cookie 就会过期。 
+
 ## 程序和请求上下文
 Flask 从客户端收到请求时，要让视图函数能访问一些对象，这样才能处理请求。请求对象就是一个很好的例子，它封装了客户端发送的 HTTP 请求。  
 在 Flask 中有两种上下文：程序上下文和请求上下文。
@@ -1200,6 +1203,47 @@ app/templates/_macros.html：分页模板宏
 ```html
 ```
 
+## 关联
+数据库使用关系建立记录之间的联系。其中，一对多关系是最常用的关系类型，它把一个记录和一组相关的记录联系在一起。实现这种关系时，要在“多”这一侧加入一个外键，指向“一”这一侧联接的记录。    
+大部分的其他关系类型都可以从一对多类型中衍生。多对一关系从“多”这一侧看，就是一对多关系。一对一关系类型是简化版的一对多关系，限制“多”这一侧最多只能有一个记录。唯一不能从一对多关系中简单演化出来的类型是多对多关系，这种关系的两侧都有多个记录。        
+
+一对多关系、多对一关系和一对一关系至少都有一侧是单个实体，所以记录之间的联系通过外键实现，让外键指向这个实体。  
+解决方法是添加第三张表，这个表称为关联表。现在，多对多关系可以分解成原表和关联表之间的两个一对多关系。  
+
+多对多关系仍使用定义一对多关系的 db.relationship() 方法进行定义，但在多对多关系中，必须把 secondary 参数设为关联表。多对多关系可以在任何一个类中定义， backref 参数会处理好关系的另一侧。关联表就是一个简单的表，不是模型，SQLAlchemy 会自动接管这个表。    
+```python
+registrations = db.Table('registrations',
+    db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
+    db.Column('class_id', db.Integer, db.ForeignKey('classes.id'))
+)
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    classes = db.relationship('Class',
+    secondary=registrations,
+    backref=db.backref('students', lazy='dynamic'),
+    lazy='dynamic')
+class Class(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String)
+
+s.classes.append(c)
+s.classes.remove(c)
+db.session.add(s)
+s.classes.all()
+c.students.all()
+```
+
+**自引用关系**
+多对多关系可用于实现用户之间的关注，但存在一个问题。在学生和课程的例子中，关联表联接的是两个明确的实体。但是，表示用户关注其他用户时，只有用户一个实体，没有第二个实体。    
+如果关系中的两侧都在同一个表中，这种关系称为自引用关系。在关注中，关系的左侧是用户实体，可以称为“关注者”；关系的右侧也是用户实体，但这些是“被关注者”。  
+
+**高级多对多关系**
+使用多对多关系时，往往需要存储所联两个实体之间的额外信息。对用户之间的关注来说，可以存储用户关注另一个用户的日期，这样就能按照时间顺序列出所有关注者。这种信息只能存储在关联表中，但是在之前实现的学生和课程之间的关系中，关联表完全是由 SQLAlchemy 掌控的内部表。  
+为了能在关系中处理自定义的数据，我们必须提升关联表的地位，使其变成程序可访问的模型。    
+
+
+
 # Markdown Flask-PageDown 富文本
 PageDown：使用 JavaScript 实现的客户端 Markdown 到 HTML 的转换程序。
 Flask-PageDown：为 Flask 包装的 PageDown，把 PageDown 集成到 Flask-WTF 表单中。
@@ -1207,7 +1251,7 @@ Markdown：使用 Python 实现的服务器端 Markdown 到 HTML 的转换程序
 Bleach：使用 Python 实现的 HTML 清理器。
 
 
-**使用Flask-PageDown**
+# 使用Flask-PageDown
 Flask-PageDown 扩展定义了一个 PageDownField 类，这个类和 WTForms 中的 TextAreaField 接口一致。  
 使用 PageDownField 字段之前，先要初始化扩展：
 ```python
@@ -1230,3 +1274,17 @@ class PostForm(Form):
 ```
 
 Markdown 预览使用 PageDown 库生成，因此要在模板中修改。Flask-PageDown 简化了这个过程，提供了一个模板宏，从 CDN 中加载所需文件。     
+```html
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
+```
+
+## 服务器处理富文本的业务逻辑
+提交表单后， POST 请求只会发送纯 Markdown 文本，页面中显示的 HTML 预览会被丢掉。和表单一起发送生成的 HTML 预览有安全隐患，因为攻击者轻易就能修改 HTML 代码，让其和 Markdown 源不匹配，然后再提交表单。  
+只提交 Markdown 源文本，在
+服务器上使用 Markdown（使用 Python 编写的 Markdown 到 HTML 转换程序）将其转换成 HTML。得到 HTML 后，再使用 Bleach 进行清理，确保其中只包含几个允许使用的 HTML 标签。    
+
+把 Markdown 格式的博客文章转换成 HTML 的过程可以在 _posts.html 模板中完成，但这么做效率不高，因为每次渲染页面时都要转换一次。避免重复工作，可在创建博客文章时做一次性转换。转换后的博客文章 HTML 代码缓存在 Post 模型的一个新字段中，在模板中可以直接调用。文章的 Markdown 源文本还要保存在数据库中，以防需要编辑。     
+
