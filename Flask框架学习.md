@@ -81,6 +81,8 @@ Map([<Rule '/' (HEAD, OPTIONS, GET) -> index>,
 <Rule '/user/<name>' (HEAD, OPTIONS, GET) -> user>])
 ```
 
+`url_for()` 方法接收的是视图方法名，不是 `app.route()` 的参数名
+
 ## 请求钩子
 在处理请求之前或之后执行代码。在请求开始时，我们可能需要创建数据库连接或者认证发起请求的用户。  
 Flask 提供了注册通用函数的功能，注册的函数可在请求被分发到视图函数之前或之后调用。  
@@ -1087,6 +1089,31 @@ current_user.isauthenticated() 方法已被移除，改成属性了，难怪报�
 {% endif %}
 ```
 
+### AnonymousUser
+定义了 AnonymousUser 类，并实现了 can() 方法和 is_administrator() 方法。这个对象继承自 Flask-Login 中的 AnonymousUserMixin 类，并将其设为用户未登录时 current_user 的值。这样程序不用先检查用户是否登录，就能自由调用 current_user.can() 和 current_user.is_administrator() 。      
+
+如果你想让视图函数只对具有特定权限的用户开放，可以使用自定义的修饰器。      
+下面实现两个修饰器，一个用来检查常规权限，一个专门用来检查管理员权限。  
+```python
+from functools import wraps
+from flask import abort
+from flask.ext.login import current_user
+def permission_required(permission):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.can(permission):
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def admin_required(f):
+    return permission_required(Permission.ADMINISTER)(f)
+```
+
+### 模板权限
+在模板中可能也需要检查权限，所以 Permission 类为所有位定义了常量以便于获取。为了避免每次调用 render_template() 时都多添加一个模板参数，可以使用上下文处理器。上下文处理器能让变量在所有模板中全局可访问。       
 
 ## itsdangerous 生成确认令牌
 确认邮件中最简单的确认链接是 <http://www.example.com/auth/confirm/<id>> 这种形式的 URL，其中 id 是数据库分配给用户的数字 id 。用户点击链接后，处理这个路由的视图函数就将收到的用户 id 作为参数进行确认，然后将用户状态更新为已确认。但这种实现方式显然不是很安全，只要用户能判断确认链接的格式，就可以随便指定 URL中的数字，从而确认任意账户。解决方法是把 URL 中的 id 换成将相同信息安全加密后得到的令牌。     
@@ -1110,3 +1137,8 @@ itsdangerous 提供了多种生成令牌的方法。其中， TimedJSONWebSignat
 dumps() 方法为指定的数据生成一个加密签名，然后再对数据和签名进行序列化，生成令牌字符串。 expires_in 参数设置令牌的过期时间，单位为秒。      
 
 为了解码令牌，序列化对象提供了 loads() 方法，其唯一的参数是令牌字符串。这个方法会检验签名和过期时间，如果通过，返回原始数据。如果提供给 loads() 方法的令牌不正确或过期了，则抛出异常。      
+
+
+## before_request before_app_request
+对蓝本来说， before_request 钩子只能应用到属于蓝本的请求上。若想在蓝本中使用针对程序全局请求的钩子，必须使用 before_app_request 修饰器。        
+如果 before_request 或 before_app_request 的回调返回响应或重定向，Flask 会直接将其发送至客户端，而不会调用请求的视图函数。因此，这些回调可在必要时拦截请求。    
