@@ -35,6 +35,10 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
+## current_user
+current_user ，因为这个变量是上下文代理对象。真正的 User 对象要使用表达式 current_user._get_current_object() 获取。     
+
+
 ## cookie
 set_cookie() 函数的前两个参数分别是 cookie 名和值。可选的 max_age 参数设置 cookie 的过期时间，单位为秒。如果不指定参数 max_age ，浏览器关闭后 cookie 就会过期。 
 

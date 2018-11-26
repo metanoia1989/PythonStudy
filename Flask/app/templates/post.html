@@ -1,5 +1,5 @@
 {% extends "common/base.html" %}
-
+{% import "bootstrap/wtf.html" as wtf %}
 {% import "common/_macros.html" as macros %}
 
 {% block title %}
@@ -21,5 +21,20 @@
                 {% endif %}
             </div>
         </div>
+    </div>
+    <div class="row">
+        <h4 id="comments">Comments</h4>
+        {% if current_user.can(Permission.COMMENT) %}
+        <div class="comment-form">
+            {{ wtf.quick_form(form) }}
+        </div>
+        {% endif %}
+        {% include "common/_comments.html" %}
+        {% if pagination %}
+        <div class="pagination">
+            {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=post.id)}}
+        </div>         
+        {% endif %}
+        
     </div>
 {% endblock page_content %}

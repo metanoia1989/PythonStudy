@@ -53,3 +53,8 @@ class PostForm(Form):
     title = StringField("标题", validators=[Required(), Length(1, 128)])
     body = PageDownField("内容", validators=[Required()])
     submit = SubmitField('添加')
+
+# 评论表单
+class CommentForm(Form):
+    body = StringField('', validators=[Required()])
+    submit = SubmitField('Submit')
