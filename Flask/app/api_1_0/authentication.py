@@ -2,7 +2,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask import g, jsonify
 from ..models import AnonymousUser, User
 from . import api
-from .errors import forbidden_error
+from .errors import forbidden_error, unauthorized
 
 auth = HTTPBasicAuth()
 
@@ -16,7 +16,7 @@ def verify_password(email_or_token, password):
         g.token_used = True
         return g.current_user is not None
     user = User.query.filter_by(email=email_or_token).first()
-    if not User:
+    if not user:
         return False
     g.current_user = user
     g.token_used = False
@@ -26,10 +26,6 @@ def verify_password(email_or_token, password):
 def auth_error():
     return unauthorized('Invalid credentials')
 
-@api.route('/posts')
-@auth.login_required
-def get_posts():
-    pass
 
 @api.before_request
 @auth.login_required

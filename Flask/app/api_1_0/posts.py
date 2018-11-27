@@ -2,15 +2,31 @@ from . import api
 from .authentication import auth
 from .. import db
 from ..models import Post, Permission
-from flask import request, g, jsonify, url_for
+from flask import request, g, jsonify, url_for, current_app
 from .decorators import permission_required
 from .errors import forbidden_error
 
-@api.route('/posts/')
+@api.route('/posts')
 @auth.login_required
 def get_posts():
-    posts = Post.query.all()
-    return jsonify({'posts': [post.to_json() for post in posts]})
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False
+    )
+    posts = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = url_for('api.get_posts', page=page-1, _external=True)
+    next = None
+    if pagination.has_next:
+        next = url_for('api.get_posts', page=page+1, _external=True)
+    return jsonify({
+        'posts': [post.to_json() for post in posts],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total
+    })
 
 @api.route('/posts/<int:id>')
 @auth.login_required
@@ -18,7 +34,7 @@ def get_post(id):
     post = Post.query.get_or_404(id)
     return jsonify(post.to_json())
 
-@api.route('/posts/', methods=['POST'])
+@api.route('/posts', methods=['POST'])
 @permission_required(Permission.WRITE_ARTICLES)
 def new_post():
     post = Post.from_json(request.json)
