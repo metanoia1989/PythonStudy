@@ -4,12 +4,27 @@
 import sqlite3
 
 class Database:
-    def __init__(self, name=None):
+    def __init__(self, name=None, tablename=None):
         self.conn = None
         self.cursor = None
+        self.table_name = None
 
         if name:
             self.open(name)
+        
+        if tablename:
+            self.tablename = tablename
+        
+    @property
+    def tablename(self):
+        return self.tablename
+
+    @tablename.setter
+    def tablename(self, value):
+        if not isinstance(value, str):
+            raise TypeError('Expected a string')
+        self.tablename = value
+
         
     def open(self, name):
         try:
@@ -30,10 +45,6 @@ class Database:
     def __exit__(self, exc_type, ext_value, traceback):
         self.close()
 
-    # 创建表
-    def create_table(self, table):
-        sql = "CREATE TABLE {0} ...."
-        pass
     
     # 增删改查
     def get(self, table, columns):
