@@ -1203,6 +1203,9 @@ type：可选参数，格式化类型
 # 装饰器
 - [理解 Python 装饰器看这一篇就够了](https://foofish.net/python-decorator.html)
 - [Python进阶 - 装饰器](https://eastlakeside.gitbooks.io/interpy-zh/content/decorators/your_first_decorator.html)
+- [[译] 12步轻松搞定python装饰器](https://www.jianshu.com/p/d68c6da1587a)
+- [Python装饰器学习（九步入门）](http://www.cnblogs.com/rhcad/archive/2011/12/21/2295507.html)
+- [Python 装饰器使用指南](https://juejin.im/post/599308856fb9a024a27bd309)
 
 装饰器的一层嵌套我能理解，用一个函数封装另外一个函数，利用延迟返回，重新封装函数，添加要加的功能代码。  
 但是两层嵌套我就不懂了，卧槽，什么鬼啊，带参数的装饰器，类装饰器，好复杂。  
