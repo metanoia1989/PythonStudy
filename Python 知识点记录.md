@@ -1198,3 +1198,100 @@ type：可选参数，格式化类型
 ＝	内容右对齐，只对数字类型有效。 (符号+填充物+数字）
 ^	内容居中
 ```
+
+
+# 装饰器
+- [理解 Python 装饰器看这一篇就够了](https://foofish.net/python-decorator.html)
+- [Python进阶 - 装饰器](https://eastlakeside.gitbooks.io/interpy-zh/content/decorators/your_first_decorator.html)
+- [[译] 12步轻松搞定python装饰器](https://www.jianshu.com/p/d68c6da1587a)
+- [Python装饰器学习（九步入门）](http://www.cnblogs.com/rhcad/archive/2011/12/21/2295507.html)
+- [Python 装饰器使用指南](https://juejin.im/post/599308856fb9a024a27bd309)
+
+装饰器的一层嵌套我能理解，用一个函数封装另外一个函数，利用延迟返回，重新封装函数，添加要加的功能代码。  
+但是两层嵌套我就不懂了，卧槽，什么鬼啊，带参数的装饰器，类装饰器，好复杂。  
+```python
+def a_new_decorator(a_func):
+    def wrapTheFunction():
+        print("I am doing some boring work before executing a_func()")
+        a_func()
+        print("I am doing some boring work after executing a_func()")
+    return wrapTheFunction
+def a_function_requiring_decoration():
+    print("I am the function which needs some decoration to remove my foul smell")
+a_function_requiring_decoration = a_new_decorator(a_function_requiring_decoration)
+a_function_requiring_decoration()
+#outputs:I am doing some boring work before executing a_func()
+#        I am the function which needs some decoration to remove my foul smell
+#        I am doing some boring work after executing a_func()
+```
+
+因为函数被装饰器的函数覆盖了，所以元信息 `__docstring__`, `__name__`也一并被覆盖， functools.wraps，wraps本身也是一个装饰器，它能把原函数的元信息拷贝到装饰器里面的 func 函数中，这使得装饰器里面的 func 函数也有和原函数 foo 一样的元信息了。     
+
+装饰器的强大在于它能够在不修改原有业务逻辑的情况下对代码进行扩展，权限校验、用户认证、日志记录、性能测试、事务处理、缓存等都是装饰器的绝佳应用场景，它能够最大程度地对代码进行复用。    
+
+带参数的装饰器，这里只嵌套了一个函数，最重要的是里层的函数被作为外层函数返回值返回，而自身返回原有的函数，并且将接收的参数注入了进去。  
+上面的 `a_new_decorator` 的内层函数返回值为`None`, 但是在里层函数的函数体，函数被执行。 
+下面的 `requires_auth` 的里层函数返回的是原有的函数，并没有被执行哦，这会被怎么处理？        
+```python
+from functools import wraps
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            authenticate()
+        return f(*args, **kwargs)
+    return decorated
+```
+
+日志是装饰器运用的代码解析 
+```python
+from functools import wraps
+
+def logit(func):
+    @wraps(func)
+    def with_logging(*args, **kwargs):
+        print(func.__name__ + "was called")
+        return func(*args, **kwargs) # 这里的意思是 调用 func ，并返回 func 的返回值， 好迷惑人啊，简写到这个地步你妹啊
+    return with_logging
+
+def addition_func(x):
+    """Do some math."""
+    return x + x
+
+addition_func = logit(addition_func) 
+# 等同于 ==> addtion_func == with_logging
+# addtion_func(4) ==> with_loggin(4) ==>  return_var = addtion_func(4) ; return return_var
+result = addition_func(4)
+print(result)
+```
+
+两层嵌套解析，两层嵌套必须在做装饰器的时候进行调用从而释放一层
+```python
+def use_logging(level):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if level == "warn":
+                logging.warn("%s is running" % func.__name__)
+            elif level == "info":
+                logging.info("%s is running" % func.__name__)
+            return func(*args)
+        return wrapper
+
+    return decorator
+
+@use_logging(level="warn") # 这里已经进行了一次函数调用，即调用了 use_loging(level="warn")，把 decorator 作为装饰器
+def foo(name='foo'):
+    print("i am %s" % name)
+
+"""
+上面三行的代码等同于
+@decorator 
+def foo(name='foo'):
+    print("i am %s" % name)
+即
+foo = decorator(foo) # 并且传入了一个变量 level="warn"
+foo = wrapper(name='foo')  = 执行添加的功能 + foo(name='foo')
+"""
+```
