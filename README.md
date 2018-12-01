@@ -36,6 +36,10 @@
 - [Flask application configuration using an environment variable and YAML](https://gist.github.com/mattupstate/2046115)
 - [4 Ways to manage the configuration in Python](https://hackernoon.com/4-ways-to-manage-the-configuration-in-python-4623049e841b)
 - [SQLAlchemy session 使用问题 ](http://einverne.github.io/post/2017/05/sqlalchemy-session.html)
+- [用Flask和Python探索Web开发的无限可能 - 知乎专栏](https://zhuanlan.zhihu.com/flask)
+
+# 数据分析
+- [呆鸟的Python数据分析](https://www.jianshu.com/c/38980843c0f2?utm_source=desktop&utm_medium=notes-included-collection)
 
 # 官方文档 
 - [sqlite3 — DB-API 2.0 interface for SQLite databases](https://pysqlite.readthedocs.io/en/latest/sqlite3.html)

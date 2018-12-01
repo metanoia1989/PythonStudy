@@ -1295,3 +1295,126 @@ foo = decorator(foo) # 并且传入了一个变量 level="warn"
 foo = wrapper(name='foo')  = 执行添加的功能 + foo(name='foo')
 """
 ```
+
+
+# 虚拟数据生成库
+- [利用ForgeryPy生成虚拟数据](https://blog.csdn.net/kikaylee/article/details/54906251)
+- [Python的伪造数据生成器:Faker](https://www.jianshu.com/p/20e41fc65dc8) 详细实用
+- [Fake data的使用和产生 - Python篇](https://www.jianshu.com/p/60ae91b29def)
+
+Faker, ForgeryPy, mimesis       
+[Mimesis](https://github.com/lk-geimfari/mimesis)  提供了各类各样数据。这些数据涉及到十几种真实使用场景              
+[Radar](https://github.com/barseghyanartur/radar) 生成随机日期时间          
+[Faker](https://github.com/joke2k/faker)  generates fake data       
+[ForgeryPy3](https://github.com/pilosus/ForgeryPy3) 包括了地理位置、日期、网络、名称等大量虚拟生成算法        
+
+Fake data顾名思义假数据，是在真实产品数据无法使用的情况下，产生地接近于产品环境的数据，多用于开发和测试。   
+
+**Fake data的原则**     
+除了刻意设计的破坏性的test data，我们需要的test data应该是接近于产品环境和现实生活的，而不是固定的搭配。接近于产品数据的fake data能够更好地揭露产品环境潜在的问题，让产品看起来具有真实的使用价值和意义。       
+
+**Fake data的使用场景**     
+1. 当你需要开发一个UI原型，但是API还没开发完成继而无法获取相关数据来显示到前端，这个时候，就可以使用mock data来模拟API，从而不阻碍UI的开发工作且使UI和API的开发并行，也有可能提早发现一些问题      
+2. 当需要产生大量的数据填充数据库的时候，可以使用自动化填充接近于产品数据的fake data到数据库来满足开发测试需求     
+3. 当需要大量类产品环境数据进行压力测试的时候      
+4. 单元测试需要产生dummy data的时候        
+
+**locale 的几个样例**   
+- `zh_CN` 简体中文
+- `zh_TW` 繁体中文
+- `en_US` 英文  
+
+
+## radar 生成随机日期时间
+```python
+import radar
+import datetime
+
+#随机日期
+print(radar.random_date())
+#随机日期+时间
+print(radar.random_datetime())
+#随机时间
+print(radar.random_time())
+#指定范围随机日期
+print(radar.random_date(
+start=datetime.datetime(year=1985, month=1, day=1),
+stop=datetime.datetime(year=1989, month=12, day=30)))
+#指定范围随机日期+时间
+print(radar.random_datetime(
+start=datetime.datetime(year=1985, month=1, day=1),
+stop=datetime.datetime(year=1989, month=12, day=30)))
+#指定范围随机时间
+print(radar.random_time(
+start="2018-01-10T09:00:10",
+stop="2018-01-10T18:00:00"))
+#radar默认使用python-dateutil库来解析日期，但是这个库非常heavy，可以选择使用轻量级的radar.utils.parse(快5倍)
+print(radar.random_datetime(
+start="2018-01-10T09:00:10",
+stop="2018-01-10T18:00:00",
+parse=radar.utils.parse))
+#radar.utils.parse usage
+start = radar.utils.parse('2018-01-01')
+stop = radar.utils.parse('2018-01-05')
+print(radar.random_datetime(start=start, stop=stop))
+```
+
+## Faker 多语言虚拟数据生成库
+使用工厂函数创建数据：
+```python
+from faker import Factory
+fake = Factory.create()
+```
+
+提供一个Faker类来创建实例
+```python
+from faker import Faker
+fake = Faker()
+```
+
+在用 Faker() 创建 faker 实例时，可以为实例指定本地化区域参数，默认为 'en_US`，因此生成的姓名、地址等都是美国的。        
+```python
+fake = Faker("zh_CN")
+```
+
+### Faker实例方法分类        
+- `address` 地址      
+- `person` 人物类：性别、姓名等       
+- `barcode` 条码类        
+- `color` 颜色类      
+- `company` 公司类：公司名、公司email、公司名前缀等       
+- `credit_card` 银行卡类：卡号、有效期、类型等        
+- `currency` 货币     
+- `date_time` 时间日期类：日期、年、月等      
+- `file` 文件类：文件名、文件类型、文件扩展名等       
+- `internet` 互联网类     
+- `job` 工作      
+- `lorem` 乱数假文        
+- `misc` 杂项类       
+- `phone_number` 手机号码类：手机号、运营商号段       
+- `python` python数据     
+- `profile` 人物描述信息：姓名、性别、地址、公司等        
+- `ssn` 社会安全码(身份证号码)        
+- `user_agent` 用户代理           
+
+### address 地址
+```python
+>>> fake.country()  # 国家
+'奥地利' 
+>>> fake.city()  # 城市
+'郑州市'
+>>> fake.city_suffix()  # 城市的后缀,中文是：市或县
+'市'
+>>> fake.address()  # 地址
+'河北省巢湖县怀柔南宁路f座 169812'
+>>> fake.street_address()  # 街道
+'邯郸路W座'
+>>> fake.street_name()  # 街道名
+'合肥路'
+>>> fake.postcode()  # 邮编
+'314548'
+>>> fake.latitude()  # 维度
+Decimal('68.0228435')
+>>> fake.longitude()  # 经度
+Decimal('155.964341')
+```
