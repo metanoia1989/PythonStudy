@@ -1377,6 +1377,45 @@ fake = Faker()
 fake = Faker("zh_CN")
 ```
 
+### 自定义扩展
+利用自定义扩展，引用外部的 provider，自定义你要的功能。     
+Faker 对象可以通过 add_provider 方法将自定义的 Provider 添加到对象中,自定义的 Provider 需要继承自 BaseProvider。
+```python
+from faker import Faker
+fake = Faker()
+
+# first, import a similar Provider or use the default one
+from faker.providers import BaseProvider
+
+# create new provider class
+class MyProvider(BaseProvider):
+    def foo(self):
+        return 'bar'
+
+# then add new provider to faker instance
+fake.add_provider(MyProvider)
+
+# now you can use:
+print(fake.foo())
+```
+
+### 随机控制
+Faker 随机生成由 random.Random 驱动。其中，.random 属性返回 random.Random 对象。通过对该对象的操作，可以实现自定义的行为。实现随机复现。不同的两次运行，只要seed一样，生成出来的信息就是一样的。        
+```python
+>>> from faker import Faker
+>>> fake = Faker()
+>>> fake.random.seed(4321)
+>>> fake.name()
+'Ryan Gallagher'
+>>> fake.address()
+'7631 Johnson Village Suite 690\nAdamsbury, NC 50008'
+>>> fake.random.seed(4321)
+>>> fake.name()
+'Ryan Gallagher'
+>>> fake.address()
+'7631 Johnson Village Suite 690\nAdamsbury, NC 50008'
+```
+
 ### Faker实例方法分类        
 - `address` 地址      
 - `person` 人物类：性别、姓名等       
@@ -1417,4 +1456,440 @@ fake = Faker("zh_CN")
 Decimal('68.0228435')
 >>> fake.longitude()  # 经度
 Decimal('155.964341')
+```
+
+### person 人物
+```python
+person 人物
+>>> fake.name() # 姓名
+'单玉珍'
+>>> fake.last_name() # 姓
+'潘'
+>>> fake.first_name() # 名
+'琴'
+>>> fake.name_male() # 男性姓名
+'官平'
+>>> fake.last_name_male() # 男性姓
+'安'
+>>> fake.first_name_male() # 男性名
+'文'
+>>> fake.name_female() # 女性姓名
+'许颖'
+```
+
+### barcode 条码
+```python
+>>> fake.ean8()  # 8位条码
+'12771363'
+>>> fake.ean13()  # 13位条码
+'9133134950963'
+>>> fake.ean(length=8)  # 自定义位数条码,只能选8或者13
+'20417161'
+```
+
+### color 颜色
+```python
+>>> fake.hex_color() # 16进制表示的颜色
+'#671f6d'
+>>> fake.rgb_css_color() # css用的rgb色
+'rgb(237,74,237)'
+>>> fake.rgb_color()  # 表示rgb色的字符串
+'208,102,218'
+>>> fake.color_name() # 颜色名字
+'Brown'
+>>> fake.safe_hex_color()  #安全16进制色
+'#ee4400'
+>>> fake.safe_color_name() # 安全颜色名字
+'maroon'
+```
+
+### company 公司
+```python
+>>> fake.company() # 公司名
+'时空盒数字科技有限公司'
+>>> fake.company_suffix() # 公司名后缀
+'科技有限公司'
+```
+
+### credit_card 银行信用卡
+```python
+>>> fake.credit_card_number(card_type=None) # 卡号
+'375325478746231'
+>>> fake.credit_card_provider(card_type=None) # 卡的提供者
+'VISA 13 digit'
+>>> fake.credit_card_security_code(card_type=None)# 卡的安全密码
+'450'
+>>> fake.credit_card_expire() # 卡的有效期
+'04/22'
+>>> fake.credit_card_full(card_type=None) # 完整卡信息
+'Maestro\n秀芳 商\n502001016117 04/27\nCVV: 144\n'
+```
+
+### currency 货币
+```python
+>>> fake.currency_code()  # 货币代码
+'HNL'
+```
+
+### date_time 时间日期
+```python
+>>> fake.date_time(tzinfo=None) # 随机日期时间
+datetime.datetime(2001, 3, 18, 17, 57, 44)
+>>> fake.iso8601(tzinfo=None) # 以iso8601标准输出的日期
+'1973-11-16T22:58:37'
+
+>>> fake.date_time_this_month(before_now=True, after_now=False, tzinfo=None) # 本月的某个日期
+datetime.datetime(2017, 11, 1, 14, 33, 48)
+>>> fake.date_time_this_year(before_now=True, after_now=False, tzinfo=None) # 本年的某个日期
+datetime.datetime(2017, 3, 2, 13, 55, 31)
+>>> fake.date_time_this_decade(before_now=True, after_now=False, tzinfo=None)  # 本年代内的一个日期
+datetime.datetime(2010, 3, 26, 6, 33, 23)
+>>> fake.date_time_this_century(before_now=True, after_now=False, tzinfo=None)  # 本世纪一个日期
+datetime.datetime(2015, 7, 21, 19, 27, 53)
+>>> fake.date_time_between(start_date="-30y", end_date="now", tzinfo=None)  # 两个时间间的一个随机时间
+datetime.datetime(2005, 12, 3, 17, 17, 15)
+
+>>> fake.timezone() # 时区
+'America/Guatemala'
+>>> fake.time(pattern="%H:%M:%S") # 时间（可自定义格式）
+'11:21:52'
+>>> fake.am_pm() # 随机上午下午
+'PM'
+>>> fake.month() # 随机月份
+'02'
+>>> fake.month_name() # 随机月份名字
+'August'
+>>> fake.year() # 随机年
+'1974'
+>>> fake.day_of_week() # 随机星期几
+'Sunday'
+>>> fake.day_of_month() # 随机月中某一天
+'02'
+>>> fake.time_delta() # 随机时间延迟
+datetime.timedelta(13371, 27637)
+>>> fake.date_object()  # 随机日期对象
+datetime.date(1983, 1, 26)
+>>> fake.time_object() # 随机时间对象
+datetime.time(17, 8, 56)
+>>> fake.unix_time() # 随机unix时间（时间戳）
+1223246848
+>>> fake.date(pattern="%Y-%m-%d") # 随机日期（可自定义格式）
+'1984-04-20'
+>>> fake.date_time_ad(tzinfo=None)  # 公元后随机日期
+datetime.datetime(341, 9, 11, 8, 6, 9)
+```
+
+### file 文件
+```python
+>>> fake.file_name(category="image", extension="png") # 文件名（指定文件类型和后缀名）
+'增加.png'
+>>> fake.file_name() # 随机生成各类型文件
+'提供.pdf'
+>>> fake.file_extension(category=None) # 文件后缀
+'txt'
+>>> fake.mime_type(category=None) # mime-type
+'image/png'
+```
+
+### internet 互联网
+```python
+>>> fake.ipv4(network=False)  # ipv4地址
+'104.225.105.10'
+>>> fake.ipv6(network=False)  # ipv6地址
+'dea6:ca11:39d0:b49f:fff1:82f1:bf88:698b'
+>>> fake.uri_path(deep=None) # uri路径
+'search/categories'
+>>> fake.uri_extension() # uri扩展名
+'.htm'
+>>> fake.uri() # uri
+'https://www.wei.com/terms/'
+>>> fake.url() # url
+'http://zheng.org/'
+>>> fake.image_url(width=None, height=None)  # 图片url
+'https://www.lorempixel.com/700/990'
+>>> fake.domain_word() # 域名主体
+'hu'
+>>> fake.domain_name() # 域名
+'hu.cn'
+>>> fake.tld() # 域名后缀
+'com'
+>>> fake.user_name() # 用户名
+'xia13'
+>>> fake.user_agent() # UA
+'Opera/8.33.(Windows NT 5.1; an-ES) Presto/2.9.171 Version/10.00'
+>>> fake.mac_address() # MAC地址
+'d6:38:cc:2a:76:b2'
+>>> fake.safe_email() # 安全邮箱
+'mingli@example.net'
+>>> fake.free_email() # 免费邮箱
+'tao44@gmail.com'
+>>> fake.company_email()  # 公司邮箱
+'jingzhong@wang.cn'
+>>> fake.email() # 邮箱
+'changjun@hao.com'
+```
+
+### job 工作
+```python
+>>> fake.job()#工作职位
+'Dealer'
+>>> fake.job() 
+'Musician'
+```
+
+### lorem 乱数假文
+```python
+>>> fake.text(max_nb_chars=200) # 随机生成一篇文章
+'语言无法应用为什一点国内.要求完成如何世界电脑发布作品.经济不同教育个人科技全国.\n在线学生发布信息上海状态.\n联系一次通过其实介绍世界.增加也是使用成功那个.\n商品免费管理公司.留言自己这种内容.\n次数内容知道这样女人感觉.操作他的生产出现如何报告文章只有.\n个人文化中心不能发布最新.质量一下提高.感觉最大工具表示最后计划.这是还有次数结果其实特别.'
+
+>>> fake.word() # 随机单词
+'能力'
+>>> fake.words(nb=3)  # 随机生成几个字
+['国家', '经营', '结果']
+>>> fake.sentence(nb_words=6, variable_nb_words=True)  # 随机生成一个句子
+'重要更多我们作品地方增加.'
+>>> fake.sentences(nb=3) # 随机生成几个句子
+['制作上海学生.', '方式汽车一样技术帮助欢迎.', '说明一种深圳经营电话帖子.']
+>>> fake.paragraph(nb_sentences=3, variable_nb_sentences=True)  # 随机生成一段文字(字符串)
+'非常环境位置有限发展首页行业.情况对于出现部门这种觉得.产品以后因为虽然由于日本不同.'
+
+>>> fake.paragraphs(nb=3)  # 随机生成成几段文字(列表)
+['就是发布要求有关这里国际.美国设备深圳经营.首页也是支持报告.', '决定可是只有发现开始一直.最后有些项目正在深圳关系决定.下载注册图片更多进行他的那些.', '必须他们发生数据准备联系.同时这样内容学校精华.']
+```
+
+### misc 杂项
+```python
+>>> fake.binary(length=10)  # 随机二进制字符串(可指定长度)
+b'U\xa9@\x1e\x96\xe7\xca\x82\x14f'
+
+>>> fake.language_code()   # 随机语言代码
+'tg'
+
+>>> fake.md5(raw_output=False)  # 随机md5，16进制字符串
+'cc4feebe419791332bbcff5e0fdf084a'
+
+>>> fake.sha1(raw_output=False) # 随机sha1，16进制字符串
+'8ac0e9980f880860b6e45ae6fd257cc847b7ae8d'
+
+>>> fake.sha256(raw_output=False)   # 随机sha256，16进制字符串
+'033151f173f4a389e38e7df2363d89741f752c474e7bdfa2ee0a794bf0b505b5'
+
+>>> fake.boolean(chance_of_getting_true=50) # 随机真假值(得到True的几率是50%)
+False
+
+>>> fake.null_boolean() # 随机真假值和null
+>>> fake.null_boolean()
+True
+
+>>> fake.password(length=10, special_chars=True, digits=True, upper_case=True, lower_case=True) # 随机密码（可指定密码策略）
+'F%722TJg_U'
+>>> fake.locale() # 随机本地代码
+'hy_AM'
+>>> fake.uuid4() # 随机uuid
+'a50d17e7-bc4f-37a3-27b3-04a24fdd0055'
+>>>
+```
+
+### phone_number 电话号码
+```python
+>>> fake.phone_number() # 手机号码
+'13334603608'
+>>> fake.phonenumber_prefix() # 运营商号段，手机号码前三位
+158
+```
+
+### python python数据
+```python
+>>> fake.pyint()  # 随机int
+7775
+>>> fake.pyfloat(left_digits=None, right_digits=None, positive=False)  # 浮点数
+-84901.5586333
+>>> fake.pydecimal(left_digits=None, right_digits=None, positive=False)  # 随机高精度数
+Decimal('-12273687068527.0')
+>>> fake.pystr(min_chars=None, max_chars=20)  # 随机字符串（可指定长度）
+'cblutNKFIyegfcHPrjzx'
+>>> fake.pybool()  # 随机bool值
+True
+
+>>> fake.pyiterable(nb_elements=10, variable_nb_elements=True)  # 随机iterable
+['ODfeVvcbAjPDBGwzljQw', 'https://www.tan.cn/list/category/homepage.php', 'YQlrsFkBieyKYaXlCljJ', Decimal('42778240911787.2'), Decimal('957411812.6383'), 'TGbqZufoiUXLQTZDrVcP', 'http://yan.com/posts/tags/search/terms.php', 3.680492634254, 'min57@hotmail.com', datetime.datetime(2001, 8, 16, 6, 10, 49), 'xMMOjlETIgKGqVGTrChG', 'yong83@xu.cn']
+
+>>> fake.pylist(nb_elements=10, variable_nb_elements=True )  # 随机生成一个list
+['KXQMXAkcEMSLfnIZkgJb', 'BtowiRsuIqyyULnSYYdr', datetime.datetime(2011, 10, 10, 14, 44, 2), datetime.datetime(2008, 5, 10, 1, 38, 38), 'juan47@hotmail.com', 'QEsdUpEqHLpThyWCjkNx', Decimal('-801375867.9'), 'ucDyeZnHAXfZtkwdVUbR', 4707, datetime.datetime(1974, 8, 7, 1, 54, 29)]
+
+>>> fake.pydict(nb_elements=10, variable_nb_elements=True)   # 随机字典
+{'其中': 9047, '一直': 'AUiUjuqccIdVAWSqzDbW', '选择': 'ddong@hotmail.com', '开发': datetime.datetime(1972, 10, 20, 14, 14, 9), '电影': 'KYmolBhkjSRxloXXFUUT', '文化': 2681, '这里': 'uyang@yahoo.com', '不会': 'ZPkwuxWsrJSHMNuFiWEx', '社会': 'CiujeaZMZSuyYwuKzEdN'}
+
+>>> fake.pyset(nb_elements=10, variable_nb_elements=True)  # 随机set
+{'bhe@hotmail.com', 'http://fu.cn/list/home.htm', 'MlJluVirRkofBnKNtphM', 296, 'ghoUSHkuEGmCzlJFKyHZ', datetime.datetime(2008, 4, 4, 2, 55, 4), 'AgbynHjdvwYpUkbMsfqr', 8751, 9649, 'tangguiying@hotmail.com', Decimal('5727570036.91'), 'HmDkExndcQIOaTtsSpsc', 'hjQlLLXuHVVzENEwoHJK'}
+
+>>> fake.pytuple(nb_elements=10, variable_nb_elements=True)   # 随机tuple
+('http://www.cai.com/index/', datetime.datetime(1973, 7, 28, 2, 12, 23), 'khltJQMYJvIDRMYodviZ', 'uJezUsEqiHaiFxwOPWvl', 'qojwZHyytBSQQavkDaTu', 'AHUCHYuVJTHnoSEuQDSY', 1012, 'uEYVuzeTlgVhrnCATfKw', 'https://www.zhou.com/categories/tags/main/', 'LbLSFZPeATtzHvbmYhGr')
+
+>>> fake.pystruct()  # 随机生成3个有10个元素的python数据结构
+```
+
+### profile 人物描述信息
+```python
+>>> fake.profile(fields=None, sex=None)  # 人物描述信息：姓名、性别、地址、公司等
+{'job': 'Licensed conveyancer', 'company': '万迅电脑信息有限公司', 'ssn': '370684199902182726', 'residence': '福建省小红市南长广州街K座 406448', 'current_location': (Decimal('18.050895'), Decimal('-0.877117')), 'blood_group': '0-', 'website': ['https://www.yi.org/', 'https://www.hu.com/', 'https://www.yin.cn/'], 'username': 'minghuang', 'name': '后英', 'sex': 'F', 'address': '安徽省秀荣市璧山嘉禾路T座 954960', 'mail': 'czhong@hotmail.com', 'birthdate': '1975-03-09'}
+>>> s = fake.simple_profile(sex="m") # 人物精简信息
+>>> for i,v in s.items():
+...     print(i,v)
+...
+username chao85
+name 邴宇
+sex M
+address 陕西省东市朝阳廖街Y座 757661
+mail xiazhang@gmail.com
+birthdate 1996-09-20
+```
+
+### ssn 社会安全码(身份证)
+```python
+>>> fake.ssn() # 随机生成身份证号(18位)
+'140100196612297997'
+>>> len(fake.ssn())
+18
+```
+
+### user_agent 用户代理
+```python
+常用在伪造浏览器信息
+>>> fake.user_agent() # 伪造UA
+'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/5361 (KHTML, like Gecko) Chrome/15.0.812.0 Safari/5361'
+
+平台信息伪造
+>>> fake.linux_platform_token()
+'X11; Linux i686'
+>>> fake.linux_processor()
+'i686'
+>>> fake.windows_platform_token()
+'Windows CE'
+>>> fake.mac_platform_token()
+'Macintosh; Intel Mac OS X 10_7_4'
+>>> fake.mac_processor()
+'PPC'
+
+浏览器伪造
+>>> fake.internet_explorer() # IE浏览器
+'Mozilla/5.0 (compatible; MSIE 5.0; Windows NT 6.1; Trident/4.0)'
+>>> fake.opera() # opera浏览器
+'Opera/9.37.(Windows 95; doi-IN) Presto/2.9.178 Version/10.00'
+>>> fake.firefox() # firefox浏览器
+'Mozilla/5.0 (Windows NT 5.0; te-IN; rv:1.9.2.20) Gecko/2015-09-28 13:29:05 Firefox/12.0'
+>>> fake.safari() # safari浏览器
+'Mozilla/5.0 (Windows; U; Windows NT 4.0) AppleWebKit/533.37.4 (KHTML, like Gecko) Version/5.0 Safari/533.37.4'
+>>> fake.chrome() # chrome浏览器
+'Mozilla/5.0 (Windows 98; Win 9x 4.90) AppleWebKit/5361 (KHTML, like Gecko) Chrome/14.0.866.0
+```
+
+## Mimesis 
+mimesis提供了各类各样数据。这些数据涉及到十几种真实使用场景，比如Dummy data about transport (truck model, car etc.), Personal data (name, surname, age, email etc.), Payment data (credit_card, credit_card_network etc.)。     
+使用Mimesis首先要确定locale，Mimesis支持多达33种不同的语言，下面列子展示了英文和中文数据。  
+```python
+from mimesis import Person
+person_en = Person('en')
+print(person_en.full_name())
+print(person_en.age())
+print(person_en.favorite_movie())
+print("*" * 20)
+person_zh = Person('zh')
+print(person_zh.full_name())
+print(person_zh.age())
+print(person_zh.favorite_movie())
+```
+
+Mimesis提供多个不同的data provider来产生不同类别的数据      
+```python
+from mimesis import Personal, Address, Business, Payment, Text, Food
+from mimesis.enums import Gender
+
+person = Personal('en')
+#可以传递性别给full_name()
+print(person.full_name(Gender.MALE))
+print(person.level_of_english())
+print(person.nationality())
+print(person.work_experience())
+print(person.political_views())
+print(person.worldview())
+
+#自定义名字pattern
+# pattern 可以有 ('U-d', 'U.d', 'UU-d', 'UU.d', 'UU_d', 'U_d', 'Ud', 'l-d', 'l.d', 'l_d', 'ld', 'default')
+templates = ['l-d', 'U-d']
+for item in templates:
+    print(person.username(template=item))
+
+address1 = Address('en')
+print(address1.coordinates())
+print(address1.city())
+
+business1 = Business('en')
+print(business1.company())
+print(business1.company_type())
+
+payment1 = Payment('en')
+print(payment1.paypal())
+print(payment1.credit_card_expiration_date())
+
+#mimesis也可以生成文字
+text1 = Text('en')
+print(text1.alphabet())
+print(text1.answer())
+print(text1.quote())
+print(text1.title())
+print(text1.word())
+print(text1.words())
+print(text1.sentence())
+
+food1 = Food('en')
+print(food1.drink())
+print(food1.fruit())
+print(food1.spices())
+```
+
+`Generic(*args, **kwargs)`方法提供了统一的接口，所有的provider都可以从这个方法进入        
+
+```python
+from mimesis import Generic
+
+g = Generic('en')
+print(g.food.fruit())
+print(g.address.postal_code())
+
+# 自定义类 
+g1 = Generic('en')
+
+class oneProvider(BaseProvider):
+    name = "dante"
+
+    class Meta:
+        name = "oneprovider"
+
+    def get_age(self):
+        return "31"
+
+g1.add_provider(oneProvider)
+
+print(g1.oneprovider.get_age())
+print(g1.oneprovider.name)
+```
+
+# 字符串格式化 % 语法已被废弃
+使用 `str.format` 更简单，可读性更好。      
+用 `%` 格式化输出 tuple 时，会报错：
+```python
+print('随机 tuple %s' % fake.pytuple(nb_elements=10, variable_nb_elements=True))
+TypeError: not all arguments converted during string formatting
+```
+
+解决办法，使用 format 方法格式化输出        
+或者创建一个单例元组，将感兴趣的元组作为惟一的项        
+```python
+t = 1,2,3
+print 'This is a tuple {0}'.format(t)
+
+>>> thetuple = (1, 2, 3)
+>>> print "this is a tuple: %s" % (thetuple,)
+this is a tuple: (1, 2, 3)
 ```
