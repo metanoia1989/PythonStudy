@@ -1110,6 +1110,15 @@ followed_posts() 方法定义为属性，因此调用时无需加 () 。
 `__slots__`变量提供一个元组来限制实例对象可以绑定那些属性。     
 
 
+## 继承
+继承调用父类的构造函数，需要 `super()`
+```python
+# python2 需要传入类名和 self
+super(MyThread,self).__init__()
+# python3 无需任何参数
+super().__init__()
+```
+
 # 列表和字段的迭代
 **迭代列表的key**
 ```python
@@ -1145,6 +1154,8 @@ for (k,v) in zip(dict.keys(),dict.values()):
 ```
 
 # 字符串格式化 % 与 format
+- [Python format 格式化函数](http://www.runoob.com/python/att-string-format.html)
+
 ## % 格式符方式
 ```python
 %[(name)][flags][width][.precision]typecode
@@ -1197,6 +1208,16 @@ type：可选参数，格式化类型
 >	内容右对齐(默认)
 ＝	内容右对齐，只对数字类型有效。 (符号+填充物+数字）
 ^	内容居中
+```
+
+```python
+>>>"{} {}".format("hello", "world")    # 不设置指定位置，按默认顺序
+'hello world'
+>>> "{0} {1}".format("hello", "world")  # 设置指定位置
+'hello world'
+print("网站名：{name}, 地址 {url}".format(name="菜鸟教程", url="www.runoob.com"))
+print("网站名：{0[0]}, 地址 {0[1]}".format(my_list))  # "0" 是必须的
+>>> print("{:.2f}".format(3.1415926));
 ```
 
 
