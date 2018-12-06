@@ -73,3 +73,26 @@ for tag, *args in records:
         do_foo(*args)
     elif tag == 'bar':
         do_bar(*args)
+
+
+"""星号解压语法操作字符串, 字符串的分割"""
+line = "nobody:*:-2:-2:Unprivileged User:/var/empty:/usr/bin/false"
+uname, *fields, homedir, sh = line.split(':')
+print("uname: {}, homedir: {}, sh: {}".format(uname, homedir, sh))
+
+"""丢弃多个解压赋值 用 *_ *ign"""
+record = ('ACME', 50, 123.45, (12, 18, 2012))
+name, *_, (*ign, year) = record
+print("name: {}, year: {}".format(name, year))
+
+
+"""星号解压语法的列表处理效果 将列表分割成前后两部分"""
+items = [1, 10, 7, 4, 5, 9]
+head, *tail = items
+print("head: {}, tail: {}".format(head, tail))
+
+""" 使用列表头尾分割方法实现递归算法 """
+def sum(items):
+    head, *tail = items
+    return head + sum(tail) if tail else head
+print("items 的元素之和 {}".format(sum(items)))
