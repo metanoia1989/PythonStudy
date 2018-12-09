@@ -38,6 +38,7 @@
 - [4 Ways to manage the configuration in Python](https://hackernoon.com/4-ways-to-manage-the-configuration-in-python-4623049e841b)
 - [SQLAlchemy session 使用问题 ](http://einverne.github.io/post/2017/05/sqlalchemy-session.html)
 - [用Flask和Python探索Web开发的无限可能 - 知乎专栏](https://zhuanlan.zhihu.com/flask)
+- [Flask Web 框架](http://elvestar.com/notes/flask/) 学习心路 非常全面
 
 # 数据分析
 - [呆鸟的Python数据分析](https://www.jianshu.com/c/38980843c0f2?utm_source=desktop&utm_medium=notes-included-collection)
