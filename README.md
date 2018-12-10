@@ -39,6 +39,15 @@
 - [SQLAlchemy session 使用问题 ](http://einverne.github.io/post/2017/05/sqlalchemy-session.html)
 - [用Flask和Python探索Web开发的无限可能 - 知乎专栏](https://zhuanlan.zhihu.com/flask)
 - [Flask Web 框架](http://elvestar.com/notes/flask/) 学习心路 非常全面
+- [在Flask框架中使用jsonify和json.dumps的区别](https://www.88shuo.com/136.html)
+- [Flask框架扩展flask-wtf之表单处理](https://www.88shuo.com/104.html)
+- [易百教程 flask教程](https://www.yiibai.com/flask/flask_overview.html)
+- [作为一个Pythoner，不会SQLAlchemy都不好意思跟同行打招呼！](https://zhuanlan.zhihu.com/p/23190728)
+- [Flask-SQLAlchemy 文档](http://www.pythondoc.com/flask-sqlalchemy/)
+- [Python Flask中表单验证的问题？](https://segmentfault.com/q/1010000011140705)
+- [应用Flask框架设计RESTFUL API接口](https://www.jianshu.com/p/2367daef7fa6)
+- [基于Auth Token及用户权限的Python Flask-Restful的Example](https://github.com/responsible/Flask-Restful-Role-Auth)
+- [Flask 扩展文档汇总](https://www.kancloud.cn/wizardforcel/flask-extension-docs)
 
 # 数据分析
 - [呆鸟的Python数据分析](https://www.jianshu.com/c/38980843c0f2?utm_source=desktop&utm_medium=notes-included-collection)
