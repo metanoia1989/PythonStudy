@@ -48,6 +48,9 @@
 - [应用Flask框架设计RESTFUL API接口](https://www.jianshu.com/p/2367daef7fa6)
 - [基于Auth Token及用户权限的Python Flask-Restful的Example](https://github.com/responsible/Flask-Restful-Role-Auth)
 - [Flask 扩展文档汇总](https://www.kancloud.cn/wizardforcel/flask-extension-docs)
+- [python教程合集 - flask](http://www.codexiu.cn/python/)
+- [SQLAlchemy模型使用](http://www.codexiu.cn/python/SQLAlchemy%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/529/)
+- [在Flask中操作数据库](https://amberno1111.github.io/2016/03/20/Flask/%E5%9C%A8FLask%E4%B8%AD%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/) 总结的非常明白
 
 # 数据分析
 - [呆鸟的Python数据分析](https://www.jianshu.com/c/38980843c0f2?utm_source=desktop&utm_medium=notes-included-collection)

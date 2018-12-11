@@ -138,3 +138,121 @@ class Tag(db.Model):
 ```
 
 映射到数据: `Base.metadata.create_all(engine)`
+
+# SQLAlchemy模型使用
+## 查询
+查询的结果, 有几种不同的类型, 这个需要注意, 像是: `instance`, `instance of list`, `keyed tuple of list`, `value of list`        
+
+**基本查询**
+```python
+session.query(User).filter_by(username='abc').all()
+session.query(User).filter(User.username=='abc').all()
+session.query(Blog).filter(Blog.create >= 0).all()
+session.query(Blog).filter(Blog.create >= 0).first()
+session.query(Blog).filter(Blog.create >= 0 | Blog.title == 'A').first()
+session.query(Blog).filter(Blog.create >= 0 & Blog.title == 'A').first()
+session.query(Blog).filter(Blog.create >= 0).offset(1).limit(1).scalar()
+session.query(User).filter(User.username ==  'abc').scalar()
+session.query(User.id).filter(User.username ==  'abc').scalar()
+session.query(Blog.id).filter(Blog.create >= 0).all()
+session.query(Blog.id).filter(Blog.create >= 0).all()[0].id
+dict(session.query(Blog.id, Blog.title).filter(Blog.create >= 0).all())
+session.query(Blog.id, Blog.title).filter(Blog.create >= 0).first().title
+session.query(User.id).order_by('id desc').all()
+session.query(User.id).order_by('id').first()
+session.query(User.id).order_by(User.id).first()
+session.query(User.id).order_by(-User.id).first()
+session.query('id', 'username').select_from(User).all()
+session.query(User).get('16e19a64d5874c308421e1a835b01c69')
+```
+
+**多表查询**
+```python
+session.query(Blog, User).filter(Blog.user == User.id).first().User.username
+session.query(Blog, User.id, User.username).filter(Blog.user == User.id).first().id
+session.query(Blog.id,
+              User.id,
+              User.username).filter(Blog.user == User.id).first().keys()
+```
+
+**条件查询**
+```python
+from sqlalchemy import or_, not_
+session.query(User).filter(or_(User.id == '',
+                               User.id == '16e19a64d5874c308421e1a835b01c69')).all()
+session.query(User).filter(not_(User.id == '16e19a64d5874c308421e1a835b01c69')).all()
+session.query(User).filter(User.id.in_(['16e19a64d5874c308421e1a835b01c69'])).all()
+session.query(User).filter(User.id.like('16e19a%')).all()
+session.query(User).filter(User.id.startswith('16e19a')).all()
+dir(User.id)
+```
+
+**函数**
+```python
+from sqlalchemy import func
+session.query(func.count('1')).select_from(User).scalar()
+session.query(func.count('1'), func.max(User.username)).select_from(User).first()
+session.query(func.count('1')).select_from(User).scalar()
+session.query(func.md5(User.username)).select_from(User).all()
+session.query(func.current_timestamp()).scalar()
+session.query(User).count()
+```
+
+## 更新
+```python
+# 通过update方式
+session.query(User).filter(User.username == 'abc').update({'name': '123'})
+session.commit()
+
+# 通过修改模型实例属性值
+user = session.query(User).filter_by(username='abc').scalar()
+user.name = '223'
+session.commit()
+```
+
+如果涉及对属性原值的引用, 则要考虑 `synchronize_session` 这个参数.      
+
+- `'evaluate'` 默认值, 会同时修改当前 session 中的对象属性.
+- `'fetch'` 修改前, 会先通过 select 查询条目的值.
+- `False` 不修改当前 session 中的对象属性.
+
+在默认情况下, 因为会有修改当前会话中的对象属性, 所以如果语句中有 SQL 函数, 或者"原值引用", 那是无法完成的操作, 自然也会报错。   
+这种情况下, 就不能要求 SQLAlchemy 修改当前 session 的对象属性了, 而是直接进行数据库的交互, 不管当前会话值。
+```python
+# 对属性原值引用 - 报错
+from sqlalchemy import func
+session.query(User).update({User.name: func.trim('123 ')})
+session.query(User).update({User.name: User.name + 'x'})
+
+# 使用 synchrozie_session
+session.query(User).update({User.name: User.name + 'x'}, synchronize_session=False)
+```
+是否修改当前会话的对象属性, 涉及到当前会话的状态. 如果当前会话过期, 那么在获取相关对象的属性值时, SQLAlchemy 会自动作一次数据库查询, 以便获取正确的值。     
+执行了 update 之后, 虽然相关对象的实际的属性值已变更, 但是当前会话中的对象属性值并没有改变. 直到 session.commit() 之后, 当前会话变成"过期"状态, 再次获取 user.name 时, SQLAlchemy 通过 user 的 id 属性, 重新去数据库查询了新值. (如果 user 的 id 变了呢? 那就会出事了啊.)           
+synchronize_session 设置成 'fetch' 不会有这样的问题, 因为在做 update 时已经修改了当前会话中的对象了.        
+不管 synchronize_session 的行为如何, commit 之后 session 都会过期, 再次获取相关对象值时, 都会重新作一次查询.            
+## 删除
+```python
+session.query(User).filter_by(username='abc').delete()
+user = session.query(User).filter_by(username='abc').first()
+session.delete(user)
+```
+删除同样有像修改一样的 synchronize_session 参数的问题, 影响当前会话的状态.
+
+## JOIN 联表
+```python
+r = session.query(Blog, User).join(User, Blog.user == User.id).all()
+for blog, user in r:
+    print blog.id, blog.user, user.id
+
+r = session.query(Blog, User.name, User.username).join(User, Blog.user == User.id).all()
+print r
+```
+
+## 只查一列
+用query的with_entites方法，查询返回的不再是DeclarativeMeta对象，而是单纯的tuple对象         
+如果有外键关系，可以使用join进行关联，join的参数要用relationship的backref值             
+```python
+User.query.with_entities(User.id,User.dept_id).all()
+User.query.with_entities(User.id,User.username,Department.department_name).join(User.dept).all()
+```
