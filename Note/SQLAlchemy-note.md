@@ -28,11 +28,13 @@ sqlite:////absolute/path/to/foo.db
 # 创建模型
 用 Column 来定义一列。列名就是您赋值给那个变量的名称。如果您想要在表中使用不同的名称，您可以提供一个想要的列名的字符串作为可选第一个参数。主键用 primary_key=True 标记。可以把多个键标记为主键，此时它们作为复合主键。      
 
-列的类型是 Column 的第一个参数:
+**列的类型**是 Column 的第一个参数:
 ```python
-Integer	一个整数
-String (size)	有长度限制的字符串
-Text	一些较长的 unicode 文本
+Integer	普通整数，一般是32bit
+String (size)	变长字符串
+Text	变长字符串，对较长或不限长度的字符做了优化
+Date 日期
+Boolean 布尔值
 DateTime	表示为 Python datetime 对象的 时间和日期
 Float	存储浮点值
 Boolean	存储布尔值
@@ -40,6 +42,15 @@ PickleType	存储为一个持久化的 Python 对象
 LargeBinary	存储一个任意大的二进制数据
 ```
 
+**db.Column 中其余的参数指定属性的配置选项**
+```python
+primary_key：如果设置为True，这列就是表的主键
+unique：如果设置为True，这列不允许出现重复的值
+index：如果设置为True，为这列创建索引，提升查询效率
+default：为这列定义默认值
+comment: 字段评论
+nullable: 是否为空
+```
 
 
 ```python
@@ -73,7 +84,6 @@ index=True 表示在该列创建索引
 ## relationship
 从lazy参数的不同值所执行的sql语句出发，结合one-to-many和many-to-many的关系，分析lazy参数取不同值(dynamic, joined, select)在不同场景下的选择
 
-**一对多关联**          
 关系使用 relationship() 函数表示。然而外键必须用类 sqlalchemy.schema.ForeignKey 来单独声明          
 backref 是一个在 Address 类上声明新属性的简单方法。     
 lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据，SQLAlchemy 会返回一个查询对象，在加载数据前您可以过滤（提取）它们。        
@@ -83,6 +93,7 @@ lazy 决定了 SQLAlchemy 什么时候从数据库中加载数据，SQLAlchemy �
 - `subquery` 类似 'joined' ，但是 SQLAlchemy 会使用子查询。
 - `dynamic` 在有多条数据的时候是特别有用的。不是直接加载这些数据，
 
+如果想为反向引用(backref)定义惰性(lazy)状态，可以使用backref()函数。        
 使用 backref() 函数，为反向引用（backrefs）定义惰性（lazy）状态     
 ```python
 class User(db.Model):
@@ -92,7 +103,18 @@ class User(db.Model):
         backref=db.backref('person', lazy='joined'), lazy='dynamic')
 ```
 
+## db.relationship()常用的配置选项
 
+- `backref`：在关系的另一个模型中添加反向引用
+- `primaryjoin`：明确指定两个模型之间使用的联结条件。只在模棱两可的关系中需要指定
+- `lazy`：决定了SQLAlchemy什么时候从数据库中加载数据。可选值有 select(首次访问时按需加载)、immediate(源对象加载后就加载)、 joined(加载记录，但使用联结)、 subquery (立即加载，但使用子查询)，noload(永不加载)和 dynamic(不加载记录，但提供加载记录的查询)
+- `uselist`：如果设为Fales，表示一对一关系
+- `order_by`：指定关系中记录的排序方式
+- `secondary`：指定多对多关系中关系表的名字
+- `secondaryjoin`：SQLAlchemy无法自行决定时，指定多对多关系中的二级联结条件
+
+
+## 一对多关联          
 
 每篇文章有一个外键指向 users 表中的主键 id， 而在 User 中使用 SQLAlchemy 提供的 relationship 描述关系。        
 而用户与文章的之间的这个关系是双向的，所以我们看到上面的两张表中都定义了 relationship。     
@@ -100,14 +122,18 @@ SQLAlchemy 提供了 backref 让我们可以只需要定义一个关系
 ```python
 class User(Base):
       __tablename__ = 'users'
-    articles = relationship('Article', backref='author')
+    articles = relationship('Article', backref='author', lazy='dynamic')
 
 class Article(Base):
     __tablename__ = 'articles'
     user_id = Column(Integer, ForeignKey('users.id'))
 ```
 
-**一对一关系**          
+db.relationship()的第一个参数表明这个关系的另一端是哪个模型。       
+db.relationship()中的backref参数向address模型中添加一个person属性，从而定义反向关系。这一属性可替代person_id访问 person模型，此时获取的是模型对象，而不是外键的值。         
+db.relationship()都能自行找到关系中的外键，但有时却无法决定把哪一列作为外键。例如如果address模型中有两个或以上的列定义为person模型的外键，SQLAlchemy就不知道该使用哪列。如果无法决定外键，你就要为db.relationship()提供额外参数，从而确定所用外键。 
+
+## 一对一关系          
 在 User 中我们只定义了几个必须的字段， 但通常用户还有很多其他信息，但这些信息可能不是必须填写的，我们可以把它们放到另一张 UserInfo 表中，这样User 和 UserInfo 就形成了一对一的关系。        
 一对一关系是基于一对多定义，定义方法和一对多相同，只是需要添加 userlist=False 。        
 ```python
@@ -120,7 +146,7 @@ class UserInfo(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
 ```
 
-**多对多关系**          
+## 多对多关系         
 一遍博客通常有一个分类，好几个标签。标签与博客之间就是一个多对多的关系。多对多关系不能直接定义，需要分解成俩个一对多的关系，为此，需要一张额外的表来协助完成。
 ```python
 tags = db.Table('tags',
@@ -139,11 +165,56 @@ class Tag(db.Model):
 
 映射到数据: `Base.metadata.create_all(engine)`
 
+
+## 多对多关系通俗解释          
+多对多关系一个典型的例子是文章与标签之间的关系，一篇文章可以有多个标签，一个标签也可以对应多篇文章。            
+把tags和posts表之间的多对多关系转换成它们各自与关联表connections之间的两个一对多关系。      
+查询这个多对多关系分为两步。若想知道某篇文章有多少个标签，首先从posts和connections之间的一对多关系开始，获取这篇文章在connections表中的所有和这篇文章相关的记录，然后再按照多到一的关系在tags表中查找对应的所有标签。       
+若想查找某个标签所对应的所有文章，首先从tags表和connections表之间的一对多关系开始，获取这个标签在connections表中所有的和这个标签相关的记录，然后再按照多到一的关系在posts表中查找对应的所有文章。       
+多对多关系仍使用定义一对多关系的db.relationship()方法进行定义，但在多对多关系中，必须把secondary参数设为关联表。多对多关系可以在任何一个类中定义，backref参数会处理好关系的另一侧。关联表connections就是一个简单的表，不是模型，SQLAlchemy会自动接管这个表。         
+```python
+connections = db.Table('connections',
+    db.Column('posts_id', db.Integer, db.ForeignKey('posts_id')),
+    db.Column('tags_id', db.Integer, db.ForeignKey('tags_id')))
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    tags = db.relationship('Tag', secondary=connections,
+        backref=db.backref('posts', lazy='dynamic'),
+        lazy='dynamic')
+class Tag(db.Model):
+    __tablename__ = 'tags'
+    id = db.Column(db.Integer, primary_key=True)
+```
+
+## 高级多对多关系          
+自引用多对多关系可在数据库中表示用户之间的关注，但却有个限制。使用多对多关系时，往往需要存储所联两个实体之间的额外信息。对用户之间的关注来说，可以存储用户关注另一个用户的日期，这样就能按照时间顺序列出所有关注者。        
+这种信息只能存储在关联表中，但是在之前实现的学生和课程之间的关系中，关联表完全是由SQLAlchemy掌控的内部表。为了能在关系中处理自定义的数据，我们必须提升关联表的地位，使其变成程序可访问的模型。          
+SQLAlchemy不能直接使用这个关联表，因为如果这么做程序就无法访问其中的自定义字段。相反地，要把这个多对多关系的左右两侧拆分成两个基本的一对多关系，而且要定义成标准的关系。            
+```python
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.Foreignkey('users.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
+        backref=db.backref('follower', lazy='joined'),
+        lazy='dynamic', cascade='all, delete-orphan')
+    follower = db.relationship('Follow', foreign_keys=[Follow.followed_id],
+        backref=db.backref('followed', lazy='joined'),
+        lazy='dynamic', cascade='all, delete-orphan')
+```
+cascade 参数配置在父对象上执行的操作对相关对象的影响。比如，层叠选项可设定为：将用户添加到数据库会话后，要自动把所有关系的对象都添加到会话中。层叠选项的默认值能满足大多数情况的需求，但对这个多对多关系来说却不合用。删除对象时，默认的层叠行为是把对象联接的所有相关对象的外键设为空值。但在关联表中，删除记录后正确的行为应该是把指向该记录的实体也删除，因为这样能有效销毁联接。这就是层叠选项值delete-orphan的作用。           
+
 # SQLAlchemy模型使用
 ## 查询
 查询的结果, 有几种不同的类型, 这个需要注意, 像是: `instance`, `instance of list`, `keyed tuple of list`, `value of list`        
 
-**基本查询**
+### 基本查询
 ```python
 session.query(User).filter_by(username='abc').all()
 session.query(User).filter(User.username=='abc').all()
@@ -166,7 +237,7 @@ session.query('id', 'username').select_from(User).all()
 session.query(User).get('16e19a64d5874c308421e1a835b01c69')
 ```
 
-**多表查询**
+### 多表查询
 ```python
 session.query(Blog, User).filter(Blog.user == User.id).first().User.username
 session.query(Blog, User.id, User.username).filter(Blog.user == User.id).first().id
@@ -175,7 +246,7 @@ session.query(Blog.id,
               User.username).filter(Blog.user == User.id).first().keys()
 ```
 
-**条件查询**
+### 条件查询
 ```python
 from sqlalchemy import or_, not_
 session.query(User).filter(or_(User.id == '',
@@ -187,7 +258,7 @@ session.query(User).filter(User.id.startswith('16e19a')).all()
 dir(User.id)
 ```
 
-**函数**
+### 函数
 ```python
 from sqlalchemy import func
 session.query(func.count('1')).select_from(User).scalar()
@@ -256,3 +327,40 @@ print r
 User.query.with_entities(User.id,User.dept_id).all()
 User.query.with_entities(User.id,User.username,Department.department_name).join(User.dept).all()
 ```
+
+# Flask-SQLAlchemy 框架配置
+Flask-SQLAlchemy从Flask主配置中加载这些值。注意其中的一些在引擎创建后不能修改，所以确保尽早配置且不在运行时修改它们。           
+- `SQLALCHEMY_DATABASE_URI`：用于数据库的连接，例如sqlite:////tmp/test.db
+- `SQLALCHEMY_TRACK_MODIFICATIONS`：如果设置成True(默认情况)，Flask-SQLAlchemy将会追踪对象的修改并且发送信号。这需要额外的内存，如果不必要的可以禁用它。      
+- `SQLALCHEMY_COMMIT_ON_TEARDOWN`：每次request自动提交db.session.commit()
+
+常见情况下，对于只有一个Flask应用，我们需要先创建Flask应用，选择加载配置，然后创建SQLAlchemy对象时候把Flask应用传递给它作为参数。一旦创建，这个对象就包含 sqlalchemy 和 sqlalchemy.orm 中的所有函数和助手。此外它还提供一个名为 Model 的类，用于作为声明模型时的 delarative 基类。          
+```python
+from flask.ext.sqlalchemy import SQLAlchemy
+db = SQLAlchemy
+def create_app(config_name):
+    #省略号部分包含了创建app等代码，请查看前面的章节
+    ...
+    db.init_app(app)
+```
+
+# Flask-SQLAlchemy 操作数据库
+使用过滤器可以配置query对象进行更精确的数据库查询       
+**常用的过滤器**
+
+- `filter()`：把过滤器添加到原查询上，返回一个新查询
+- `filter_by()`：把等值过滤器添加到原查询上，返回一个新查询
+- `limit()`：使用指定的值限制原查询返回的结果数量，返回一个新查询
+- `offset()`：偏移原查询返回的结果，返回一个新查询
+- `order_by()`：根据指定条件对原查询结果进行排序，返回一个新查询
+- `group_by()`：根据指定条件对原查询结果进行分组，返回一个新查询
+
+**常用的执行查询方法**
+
+- `all()`：以列表形式返回查询的所有结果
+- `first()`：返回查询的第一个结果，如果没有结果，则返回 None
+- `first_or_404()`：返回查询的第一个结果，如果没有结果，则终止请求，返回 404 错误响应
+- `get()`：返回指定主键对应的行，如果没有对应的行，则返回 None
+- `get_or_404()`：返回指定主键对应的行，如果没找到指定的主键，则终止请求，返回 404 错误响应
+- `count()`：返回查询结果的数量
+- `paginate()`：返回一个 Paginate 对象，它包含指定范围内的结果
