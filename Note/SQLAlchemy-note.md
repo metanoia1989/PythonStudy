@@ -3,6 +3,8 @@
 - [遇到一个问题，请各位给讲解一下SQLAlchemy中的backref？](https://www.zhihu.com/question/38456789)
 - [SQLalchemy relationship之lazy属性 学习笔记](https://blog.csdn.net/bestallen/article/details/52601457)
 - [flask-sqlalchemy中 backref lazy的参数实例解释和选择](https://blog.csdn.net/qq_34146899/article/details/52559747)
+- [Python—sqlalchemy - 详细的使用介绍](http://www.cnblogs.com/melonjiang/p/5360592.html) 需要参考
+- [sqlalchemy中多对多的关系](https://blog.csdn.net/kuangshp128/article/details/61618519)
 
 官方文档的脉络不太清晰，要扫过一遍并且学以致用才能感受得到。example很友好的！       
 
@@ -186,6 +188,43 @@ class Tag(db.Model):
     __tablename__ = 'tags'
     id = db.Column(db.Integer, primary_key=True)
 ```
+
+## 多对多关系 中间表的增删改查
+- [python – Flask sqlalchemy多对多插入数据](https://codeday.me/bug/20180112/117011.html)
+- [flask-sqlalchemy 一对一，一对多，多对多操作](https://www.cnblogs.com/huchong/p/8797516.html)
+**定义多对多关系的三个步骤**        
+1. 定义一个中间表保存两个表的主键
+2. 定义多对多关系的两个表的模型
+3. 给每个模型都添加一个访问对方的属性注意在relationship中指定中间表
+
+第三步的给每个模型，添加访问对方的属性，可以在一方配置 backref 即可。
+
+**关联表的修改**        
+```python
+groups = session.query(Group).all()#找出所有组
+
+h1=session.query(Host).filter(Host.name=="172.0.0.1").first()#找出h1
+h2=session.query(Host).filter(Host.name=="172.0.0.2").first()#找出h2
+
+h1.group=groups#h1关联3个组
+h2.group=groups[1:-1]#h2关联两个组
+```
+
+**关联表数据的添加**
+```python
+p = Parent()
+c = Child()
+p.children.append(c)
+db.session.add(p)
+db.session.commit()
+```
+
+## 简单多对多中间表不采用模型的原因
+- [flask-sqlalchemy 中的多对多关系里面说到中间表的建立强烈不建议使用模型，为什么？](https://www.v2ex.com/t/184723)
+
+如果这个many-to-many关系中没有其它信息需要维护，tag和page直接引用到对方(e.g. tag.related_pages, page.related_tags)，因为不需要显示地对token做操作，也就没有必要为它创建class/model (想像这些model的下游码农不是你自己，那他应该不需要知道token table的存在)
+
+否则，假设token记录了譬如created_at这样的额外信息，三张表的关联变成 tag <-> token <-> page，为了取得created_at就绕不开token，因此需要把token table暴露出来
 
 ## 高级多对多关系          
 自引用多对多关系可在数据库中表示用户之间的关注，但却有个限制。使用多对多关系时，往往需要存储所联两个实体之间的额外信息。对用户之间的关注来说，可以存储用户关注另一个用户的日期，这样就能按照时间顺序列出所有关注者。        

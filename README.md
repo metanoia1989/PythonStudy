@@ -29,9 +29,17 @@
 - [最全36种python设计模式](https://www.cnblogs.com/ydf0509/p/8527851.html)
 - [Python 资源大全中文版](https://www.jianshu.com/p/9c6ae64a1bd7?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation)
 
+# 网络爬虫
+- [156个Python网络爬虫资源大全](https://www.ctolib.com/topics-122227.html)
+- [Ip2region is a offline IP location library with accuracy rate of 99.9% and 0.0x millseconds searching performance](https://github.com/lionsoul2014/ip2region)
+
 # api 开发
 - [Swagger/OpenAPI First framework for Python on top of Flask](https://github.com/zalando/connexion)
 - [Building and Documenting Python REST APIs With Flask and Connexion](https://realpython.com/flask-connexion-rest-api/)
+
+# Web开发相关
+- [汉字转拼音(pypinyin) ](https://github.com/mozillazg/python-pinyin)
+- [Returns unicode slugs](https://github.com/un33k/python-slugify)
 
 # flask
 - [Flask application configuration using an environment variable and YAML](https://gist.github.com/mattupstate/2046115)
@@ -51,6 +59,7 @@
 - [python教程合集 - flask](http://www.codexiu.cn/python/)
 - [SQLAlchemy模型使用](http://www.codexiu.cn/python/SQLAlchemy%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/529/)
 - [在Flask中操作数据库](https://amberno1111.github.io/2016/03/20/Flask/%E5%9C%A8FLask%E4%B8%AD%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/) 总结的非常明白
+- [cookiecutter-flask](https://github.com/sloria/cookiecutter-flask) 使用 bootstrap4, webpack 构建的flask模板
 
 # 数据分析
 - [呆鸟的Python数据分析](https://www.jianshu.com/c/38980843c0f2?utm_source=desktop&utm_medium=notes-included-collection)
@@ -65,7 +74,7 @@
 - [开源中国 python 代码分享](https://www.oschina.net/code/list/7/python)
 - [500 Lines or Less](https://github.com/aosabook/500lines)
 - [玩蛇网 python代码](http://www.iplaypy.com/code/)
-
+- [flask-restful-demo](https://github.com/joshfriend/flask-restful-demo) 使用 flask-restful 扩展的demo
 
 # telegram bot
 我超喜欢聊天bot这种东西，telegram bot 可以做很多有趣的事情。
