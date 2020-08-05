@@ -2,30 +2,36 @@
 # -*- coding: utf-8 -*-
 
 """
-对应大量的字段类型，每个类型都有其自己的设置。      
-查看列表中的每一个词典，然后使用所包含的信息来生成词典中定义的字段。    
+将循环和条件语句堆加在各表单内部和之上将很快变得无法阅读和不可维护
+取出每个字段的生成代码的主要部分，并且将之放入一个单独的函数，
+这个函数使用词典并且返回一段该字段的HTML代码。
+不用修改主函数的任何功能、输入或者输出。    
 """
 def generate_webform(field_dict_list):
     generated_field_list = []
 
     for field_dict in field_dict_list:
         if field_dict["type"] == "text_field":
-            generated_field_list.append(
-                '{0}:<br><input type="text" name="{1}"><br>'.format(
-                    field_dict["label"],
-                    field_dict["name"]
-                )
-            ) 
+            field_html = generate_text_field(field_dict)
+
         elif field_dict["type"] == "checkbox":
-            generated_field_list.append(
-                '<label><input type="checkbox" id="{0}" value="{1}">{2}<br>'.format(
-                    field_dict["id"],
-                    field_dict["value"],
-                    field_dict["label"]
-                )
-            ) 
+            field_html = generate_checkbox(field_dict)
+
     generated_fields = "\n".join(generated_field_list)
     return "<form>{fields}</form>".format(fields=generated_fields)
+
+def generate_text_field(text_field_dict):
+    return '{0}:<br><input type="text" name="{1}"><br>'.format(
+        field_dict["label"],
+        field_dict["name"]
+    )
+    
+def generate_checkbox(checkbox_dict):
+    return '<label><input type="checkbox" id="{0}" value="{1}">{2}<br>'.format(
+        field_dict["id"],
+        field_dict["value"],
+        field_dict["label"]
+    )
 
 def build_html_form(field_list):
     with open("form_file.html", "w") as f:
