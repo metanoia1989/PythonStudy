@@ -31,4 +31,10 @@ Python设计模式 https://book.douban.com/subject/30428666/
 * A Guide to Python's Magic Methods https://rszalski.github.io/magicmethods/
 * Python equivalent of PHPs __call() magic method? https://stackoverflow.com/questions/3638235/python-equivalent-of-phps-call-magic-method
 * What is the fastest way to check if a class has a function defined? https://stackoverflow.com/questions/5268404/what-is-the-fastest-way-to-check-if-a-class-has-a-function-defined
-* 
+
+# TODO
+TODO 原型模式的课后练习需要完成
+TODO 工厂模式的课后练习需要完成
+TODO 建造者模式的课后练习需要完成
+
+这些练习非常有意义，非常能锻炼思维和能力。  
