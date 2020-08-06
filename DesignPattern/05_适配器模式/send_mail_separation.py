@@ -13,7 +13,7 @@ class UserFetcher(object):
     def __init__(self, source):
         self.source = source
 
-    def fetch_users():
+    def fetch_users(self):
         with open('users.csv', 'r') as csv_file:
             reader = csv.DictReader(csv_file)
             users = [ x for row in reader]
@@ -21,7 +21,7 @@ class UserFetcher(object):
 
         
 class Mailer(object):
-    def send(sender, recipients, subject, message):
+    def send(self, sender, recipients, subject, message):
         msg = MIMEText(message)
         msg['Subject'] = subject
         msg['From'] = sender
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     mailer.send(
         'me@example.com',
-        [x"email" for x in users],
+        [x["email"] for x in users],
         "This is your message",
         "Have a good day"
     )

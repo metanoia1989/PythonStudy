@@ -28,7 +28,7 @@ if __name__ == "__main__":
     mailer = Mailer()
     mailer.send(
         'me@example.com',
-        [x"email" for x in users],
+        [x["email"] for x in users],
         "This is your message",
         "Have a good day"
     )
