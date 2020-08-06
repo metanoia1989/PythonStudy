@@ -27,6 +27,8 @@ Python设计模式 https://book.douban.com/subject/30428666/
 * 发布-订阅模式
 
 
+了解这些设计模式，继续实践，希望每天都能取得进步，成为出色的工程师。    
+
 # Python 关于面向对象的资料
 * A Guide to Python's Magic Methods https://rszalski.github.io/magicmethods/
 * Python equivalent of PHPs __call() magic method? https://stackoverflow.com/questions/3638235/python-equivalent-of-phps-call-magic-method
