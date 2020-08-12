@@ -11,6 +11,7 @@ def fib_cached(n, cache):
         return cache[n]
 
     cache[n] = fib_cached(n - 2, cache) + fib_cached(n - 1, cache)
+    return cache[n]
 
 if __name__ == "__main__":
     cache = {}
