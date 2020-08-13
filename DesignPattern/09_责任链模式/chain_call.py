@@ -21,9 +21,11 @@ class Function1Class(object):
         self.next_to_execute = CatchAll()
 
     def execute(self, request):
-        print("function_1")
-        print(request)
-        request = "".join([x for x in request if x != '1'])
+        if '1' in request:
+            print("function_1")
+            print(request)
+            request = "".join([x for x in request if x != '1'])
+
         self.next_to_execute.execute(request)
 
 class Function2Class(object):
@@ -31,9 +33,11 @@ class Function2Class(object):
         self.next_to_execute = CatchAll()
 
     def execute(self, request):
-        print("function_2")
-        print(request)
-        request = "".join([x for x in request if x != '2'])
+        if '2' in request:
+            print("function_2")
+            print(request)
+            request = "".join([x for x in request if x != '2'])
+
         self.next_to_execute.execute(request)
 
 class Function3Class(object):
@@ -41,9 +45,11 @@ class Function3Class(object):
         self.next_to_execute = CatchAll()
 
     def execute(self, request):
-        print("function_3")
-        print(request)
-        request = "".join([x for x in request if x != '3'])
+        if '3' in request:
+            print("function_3")
+            print(request)
+            request = "".join([x for x in request if x != '3'])
+
         self.next_to_execute.execute(request)
 
 class Function4Class(object):
@@ -51,9 +57,11 @@ class Function4Class(object):
         self.next_to_execute = CatchAll()
 
     def execute(self, request):
-        print("function_4")
-        print(request)
-        request = "".join([x for x in request if x != '4'])
+        if '4' in request:
+            print("function_4")
+            print(request)
+            request = "".join([x for x in request if x != '4'])
+
         self.next_to_execute.execute(request)
 
 def main_function(head, request):
