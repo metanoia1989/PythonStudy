@@ -28,7 +28,7 @@ class AbstractVisitor(object, metaclass=ABCMeta):
         raise NotImplementedError("A visitor needs to define a visit method")
 
 class Light(Visitable):
-    def __init(self, name):
+    def __init__(self, name):
         self.name = name
         self.status = self.get_status()
 
@@ -309,5 +309,4 @@ class HomeAutomationBootTests(unittest.TestCase):
         self.assertEqual(retrieved_state, sorted(expected_state))
 
 if __name__ == "__main__":
-    # unittest.main() 
-    Light("Bedroom Light"),
+    unittest.main() 
