@@ -133,16 +133,23 @@ class HomeAutomationBootTests(unittest.TestCase):
         self.thermal_regulator.boot_up()
         self.assertEqual(self.thermal_regulator.status, 'on')
 
+    def test_boot_front_door_lock_does_nothing_state(self):
+        state_before = self.front_door_lock.status
+        self.front_door_lock.boot_up()
+        self.assertEqual(state_before, self.front_door_lock.status)
+
+    def test_boot_coffee_machine_turns_it_on(self):
+        self.coffee_machine.boot_up()
+        self.assertEqual(self.coffee_machine.status, 1)
+
+    def test_boot_light_turns_it_off(self):
+        self.bedroom_light.boot_up()
+        self.assertEqual(self.bedroom_light.status, 0)
+
+    def test_boot_system_clock_zeros_it(self):
+        self.system_clock.boot_up()
+        self.assertEqual(self.system_clock.status, "00:00")
+
 
 if __name__ == "__main__":
-    device_network = [
-        Thermostat("General Thermostat"),
-        TemperatureRegulator("Thermal Regulator"),
-        DoorLock("Front Door Lock"),
-        CoffeeMachine("Coffee Machine"), 
-        Light("Bedroom Light"),
-        Light("Kitchen Light"),
-        Clock("System Clock")
-    ]
-    for device in device_network:
-        print("{} is online: \t{}".format(device.name, device.is_online()))
+    unittest.main()
