@@ -13,6 +13,7 @@ CREATE TABLE `tk_chapter` (
     `name` VARCHAR(255) NOT NULL COMMENT '章节名称', 
     `level` INT(10) NOT NULL COMMENT '级别 1 科目 2 章节 3 知识点',
     `pid` INT(10) NOT NULL DEFAULT 0 COMMENT '父章节 ID',
+    `order` INT(10) NOT NULL DEFAULT 0 COMMENT '排序',
     `path` VARCHAR(255) NOT NULL DEFAULT '' COMMENT '冗余字段，包含所有父级ID组成的字符串', 
     PRIMARY KEY (`id`),
     INDEX `path`(`path`)
@@ -28,6 +29,7 @@ CREATE TABLE `tk_questions` (
     `content` TEXT COMMENT '题目内容', 
     `select` TEXT COMMENT '选项', 
     `answer` TEXT COMMENT '答案', 
+    `order` INT(10) NOT NULL DEFAULT 0 COMMENT '排序',
     `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
@@ -36,3 +38,6 @@ CREATE TABLE `tk_questions` (
 DEFAULT CHARSET = utf8
 ENGINE=InnoDB;
 ```
+
+
+初始入口地址 https://m10.bjzjxf.com/Home/Index/index
