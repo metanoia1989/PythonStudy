@@ -44,14 +44,14 @@ def http_request(url):
     发起get请求，请求的内容会缓存到文件中   
     """
     filename = url_to_file(url)
-    if redis.exists(CACHED_URLS) and redis.sismember(CACHED_URLS, url):
-        if os.path.exists(filename):
-            with open(filename, "r", encoding="utf8") as f:
-                print("没有调用请求")
-                return f.read()
+    if os.path.exists(filename):
+        # if redis.exists(CACHED_URLS) and redis.sismember(CACHED_URLS, url):
+        with open(filename, "r", encoding="utf8") as f:
+            print("没有调用请求")
+            return f.read()
     headers = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36',
-      'Cookie': 'PHPSESSID=v5c40ub4fmjk4lalifdqq32h06'
+      'Cookie': settings.COOKIE 
     }
     response = requests.get(url, headers=headers, allow_redirects=True)
     if response.history:
@@ -193,6 +193,7 @@ def fetch_questions(url, chapter_id):
     
     if redis.exists(PROCESSED_URLS) and redis.sismember(PROCESSED_URLS, url):
         print("题目已处理，跳过")
+        return
 
 
     res = http_request(url)
@@ -213,6 +214,13 @@ def fetch_questions(url, chapter_id):
     contents = qhtml.xpath("./b/text()") # 题目正文
     selects = qhtml.xpath("./ul") # 题目选项
     answers = qhtml.xpath("./div[@class='answer']") # 答案选项
+    
+    if len(selects) != number or len(contents) != number or len(answers) != number:
+        redis.sadd(PROCESSED_URLS, url) 
+        print("此知识点内容有误，请手动处理")
+        redis.sadd("need_handle_urls", url) 
+        return
+    
     for i in range(0, number):
         # 提取选项 
         select_list =  selects[i].xpath("./li/text()")
@@ -233,9 +241,11 @@ def fetch_questions(url, chapter_id):
 
     # 插入题目
     for item in items:
+        if isinstance(item["title"], list):
+            item["title"] = item["title"].pop()
         row = db.select_one("SELECT * FROM `tk_questions` WHERE `chapter_id`=%s and `title`=%s", (chapter_id, item["title"]))
         if row is not None:
-            print("{0} 题目已存在，无法插入！".format(item["name"]))
+            print("{0} 题目已存在，无法插入！".format(item["title"]))
             continue
         sql = """
             INSERT INTO `tk_questions` ( `chapter_id`, `title`, `content`, `select`, `answer`, `order`) 
@@ -252,5 +262,8 @@ if __name__ == "__main__":
     init_env()
     fetch_project()
     
-    # fetch_questions("https://m10.bjzjxf.com/Home/Index/qaq/2568", 135)
+    # fetch_questions("https://m10.bjzjxf.com/Home/Index/qaq/2568", 135 # 空白问题
+    # fetch_questions("https://m10.bjzjxf.com/Home/Index/qaq/1888", 187) # html节点错乱问题
+    # fetch_questions("https://m10.bjzjxf.com/Home/Index/qaq/482", 1015) # 题序提取 有多余的内容
+    # fetch_questions("https://m10.bjzjxf.com/Home/Index/qaq/474", 1221) # 题干被图片替代了，选项有图就不行了
     

@@ -1,0 +1,5 @@
+python-doenv
+pymysql
+redis
+lxml
+requests
