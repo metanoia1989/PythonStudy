@@ -25,6 +25,12 @@ class MySQL(object):
         cursor = self.__execute(query, parameters)
         self.connection.commit()
         return cursor.rowcount if cursor is not None else 0
+
+    def insert(self, query, parameters=[]):
+        cursor = self.__execute(query, parameters)
+        self.connection.commit()
+        return cursor.lastrowid if cursor is not None else 0
+    
  
     def select_all(self, query, parameters=[]):
         cursor = self.__select(query, parameters)
