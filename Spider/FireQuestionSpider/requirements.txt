@@ -5,3 +5,4 @@ lxml
 requests
 
 python-docx
+xlwt

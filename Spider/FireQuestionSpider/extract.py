@@ -228,13 +228,13 @@ def fetch_questions(url, chapter_id):
         select_list = [ " ".join(x).replace("\u2003\u2002", "") for x in select_list ]
 
         # 提取答案
-        answer_text = list(filter(lambda x : x != "您选择:",  answers[i].xpath("./text()"))) 
+        answer_text = list(filter(lambda x : x != "您选择:",  answers[i].xpath(".//text()"))) 
 
         item = {
             "title": qhtml.xpath("./div[@id={0}]/text()".format(i+1)),
             "select": "\n".join(select_list),
             "content": contents[i],
-            "answer": "\n".join(answer_text),
+            "answer": answer_text[0] + answer_text[1] + "\n".join(answer_text[2:]),
             "order": i + 1,
         }
         items.append(item)

@@ -64,10 +64,12 @@ def export_project(project_id):
         for know in chapter["child"]: 
             document.add_heading(know["name"], 2)
             for question in know["questions"]:
-                document.add_paragraph(question["title"])
+                title = document.add_paragraph()
+                title.add_run(question["title"]).bold = True
                 document.add_paragraph(question["content"])
                 document.add_paragraph(question["select"])
                 document.add_paragraph(question["answer"])
+                document.add_paragraph("")
 
     filename = project_name.strip().replace("/", " ")
     document.save(filename + ".docx")
