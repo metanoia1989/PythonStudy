@@ -211,6 +211,10 @@ def export_all():
     for i in [4, 5, 6]:
         export_middle_project(i)
 
+    # 导出 高级
+    for i in [7, 8]:
+        export_middle_project(i)
+
 
         
 def write_excel_test():
