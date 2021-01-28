@@ -112,7 +112,7 @@ def fetch_chapter(chapter_name, url):
         }
         print("下载章节：{0}  {1}".format(child["name"], child["url"]))
         childHtml = etree.HTML(http_request(child["url"]))
-        childContents = html.xpath("//div[@class='column1-unit'][1]//text()")
+        childContents = childHtml.xpath("//div[@class='column1-unit'][1]//text()")
         child["content"] = "\n".join(list(filter(lambda x: not x.isspace(), childContents))) 
         item["children"].append(child)
 
@@ -145,5 +145,8 @@ if __name__ == "__main__":
     init_env()
 
     fetch_book()
+    
+    # chapter = fetch_chapter("结束语", "https://www.un.org/chinese/esa/education/lifelonglearning/conclusion.html")
+    # print(chapter)
     
     
