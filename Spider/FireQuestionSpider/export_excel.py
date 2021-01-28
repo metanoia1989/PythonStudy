@@ -77,7 +77,7 @@ def export_base_project(project_id):
                 question_type = re.findall(r"\((.+)\)", question["title"])[0]
                 # 提取答案和解析
                 try:
-                    [ answer, analyze ] = re.findall(r"^正确答案:([A-D]+)[\s\S]*?\(单击隐藏\)(.*)$", question["answer"], re.DOTALL|re.UNICODE)[0]
+                    [ answer, analyze ] = re.findall(r"^正确答案:([A-F]+)[\s\S]*?\(单击隐藏\)(.*)$", question["answer"], re.DOTALL|re.UNICODE)[0]
                 except IndexError:
                     answer = ""
                     analyze = re.findall(r"\(单击隐藏\)([\s\S]*)$", question["answer"], re.DOTALL|re.UNICODE)[0].strip()
@@ -162,7 +162,7 @@ def export_middle_project(project_id):
                 question_type = re.findall(r"\((.+)\)", question["title"])[0]
                 # 提取答案和解析
                 try:
-                    [ answer, analyze ] = re.findall(r"^正确答案:([A-D]+)[\s\S]*?\(单击隐藏\)(.*)$", question["answer"], re.DOTALL|re.UNICODE)[0]
+                    [ answer, analyze ] = re.findall(r"^正确答案:([A-F]+)[\s\S]*?\(单击隐藏\)(.*)$", question["answer"], re.DOTALL|re.UNICODE)[0]
                 except IndexError:
                     answer = ""
                     analyze = re.findall(r"\(单击隐藏\)([\s\S]*)$", question["answer"], re.DOTALL|re.UNICODE)[0].strip()
