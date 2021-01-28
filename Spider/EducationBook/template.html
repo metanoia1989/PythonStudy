@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育：财富蕴藏其中</title>
+</head>
+<body>
+    <div class="pages">
+        {% for volume in items %}
+        <div class="volume">
+            <div class="volume-hader">
+                <h1 class="volumn-title">第{{ loop.index }}卷 {{ volume.name }}</h1> 
+            </div>
+            <div class="volume-desc">
+                {% autoescape false %}
+                {{ volume.content | replace("\n", "<p class='devide'><p>") }} 
+                {% endautoescape %}
+            </div>
+
+            {% if volume.children %}
+            <div class="chapter-list">
+                {% for chapter in volume.children %}
+                <div class="chapter">
+                    <h2 class="chapter-title">{{ chapter.name }}</h2>  
+                    <div class="chapter-content">
+                        {% autoescape false %}
+                            {{ chapter.content | replace("\n", "<p class='devide'><p>") }} 
+                        {% endautoescape %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    </div> 
+</body>
+</html>
