@@ -1,0 +1,8 @@
+python-doenv
+pymysql
+redis
+lxml
+requests
+
+python-docx
+xlwt
