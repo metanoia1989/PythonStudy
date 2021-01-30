@@ -12,20 +12,15 @@
             <div class="volume-hader">
                 <h1 class="volumn-title">第{{ loop.index }}卷 {{ volume.name }}</h1> 
             </div>
-            <div class="volume-desc">
-                {% autoescape false %}
-                {{ volume.content | replace("\n", "<p class='devide'><p>") }} 
-                {% endautoescape %}
-            </div>
 
-            {% if volume.children %}
+            {% if volume.child %}
             <div class="chapter-list">
-                {% for chapter in volume.children %}
+                {% for chapter in volume.child %}
                 <div class="chapter">
                     <h2 class="chapter-title">{{ chapter.name }}</h2>  
                     <div class="chapter-content">
                         {% autoescape false %}
-                            {{ chapter.content | replace("\n", "<p class='devide'><p>") }} 
+                            {{ chapter.content | replace("\n", "<p class='devide'></p>") }} 
                         {% endautoescape %}
                     </div>
                 </div>

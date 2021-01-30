@@ -1,8 +1,8 @@
-python-doenv
+python-dotenv
 pymysql
 redis
 lxml
 requests
 
-python-docx
-xlwt
+weasyprint
+jinja2
