@@ -18,7 +18,7 @@ CREATE TABLE `book_article` (
     `chapter_id` INT(10) NOT NULL COMMENT '题目所属章节',
     `title` VARCHAR(255) NOT NULL COMMENT '题目标题', 
     `order` VARCHAR(10) NOT NULL DEFAULT '' COMMENT '排序',
-    `content` TEXT COMMENT '题目内容', 
+    `content` LONGTEXT COMMENT '题目内容', 
     PRIMARY KEY (`id`),
     INDEX `chapter_id`(`chapter_id`)
 )

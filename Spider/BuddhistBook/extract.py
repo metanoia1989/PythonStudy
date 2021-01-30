@@ -16,7 +16,7 @@ from utils import *
 
 # 测试MySQL
 db = MySQL(settings.DATABASE_HOST, settings.DATABASE_USERNAME, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
-redis = StrictRedis()
+redis = StrictRedis(charset="utf-8", decode_responses=True)
 PROCESSED_URLS = "processed_urls" # 已处理的url
 CHAPTERS = "chapter_ids" # 所有章节的名称及ID
 
@@ -54,8 +54,8 @@ def http_request(url):
     #   'Cookie': settings.COOKIE 
     }
     proxies = {
-        'http': 'http://localhost:10809',
-        'https': 'http://localhost:10809',
+        'http': 'http://127.0.0.1:10809',
+        'https': 'http://127.0.0.1:10809',
     }
 
     response = requests.get(url, headers=headers, allow_redirects=True, proxies=proxies)
@@ -75,8 +75,6 @@ def fetch_book():
     html = etree.HTML(res)
 
     # 所有的项目节点
-    # links_li = html.xpath("//table[@class='content']/tobody/tr[3]/td[1]")
-    # links_li = html.xpath("//table[@class='content']/tbody/tr/td/table/tbody/tr[3]/td[1]/table/tbody/tr/td[2]")
     links_li = html.xpath("//table[@class='content']//strong")
     chapters = [] 
     for li in links_li:
@@ -119,86 +117,104 @@ def fetch_book():
         fetch_chapter(chapter["name"], chapter["url"])
 
     
-def fetch_chapter(chatper_name, url):
+def fetch_chapter(chapter_name, url):
     """
     根据知识点来提取题目
-    :chapter_name 章节名称
+    :chapter_name 经文名
     :url string 章节url
     """
-    print("章节提取开始：{0} {1}".format(chatper_name, url))
+    print("经文提取开始：{0} {1}".format(chapter_name, url))
 
     if redis.exists(PROCESSED_URLS) and redis.sismember(PROCESSED_URLS, url):
-        print("章节已处理，跳过")
+        print("经文已处理，跳过")
         return
 
     res = http_request(url)
     html = etree.HTML(res)
     
-    # 正则匹配题目数量
+    # 提取卷名
+    chapter_names = "|".join(redis.hkeys(CHAPTERS))
+    volume = " ".join(html.xpath("//table[@class='content']//p[1]//text()")) 
+    if volume.isspace() or len(volume) == 0:
+        # =_= 当页面没有p的时候，就只能全文匹配了，贼恶心
+        volume = " ".join(html.xpath("//table[@class='content']//text()")) 
+        
     try:
-        number = html.xpath("//div[@id='1']/text()")[0]
-        number = int(re.findall(r"共(\d+)题", number)[0]) 
-    except IndexError:
+        volume = re.search(r"({0})".format(chapter_names), volume).group()
+    except Exception as e:
+        volume = "小部"
+        
+    volume_id = redis.hget(CHAPTERS, volume)
+
+    # 提取内容
+    content = html.xpath("//table[@class='content']//p//text()")
+    content = "\n".join(list(filter(lambda x: x != "\u3000\u3000", content)))
+    [ order, title] = re.search(r"(\d+-?\d?)\s+(.*)$", chapter_name).groups()
+
+    item = {
+        "title": title,
+        "order": order,
+        "chapter_id": volume_id,
+        "content": ""
+    }
+
+    contents = []
+    contents.append(content)
+
+    # 提取其他几页
+    LINK_PAGE_BASE = "http://www.chilin.edu.hk/edu/report_section_detail.asp"
+    links = html.xpath("//td[@class='subtitle'][1]")[0].xpath("./following-sibling::td[1]//a//@href")
+    links = list(map(lambda x : LINK_PAGE_BASE + x, links))
+    for link in links:
+        res = http_request(link)
+        html = etree.HTML(res)
+        content = html.xpath("//table[@class='content']//p//text()")
+        if len(content) == 0:
+            content = html.xpath("//table[@class='content']//td/text()")
+            content = list(filter(lambda x: x == "\u3000\u3000" or not x.replace("|","").isspace(), content))[1:]
+             
+        content = "\n".join(list(map(lambda x: "\n" if x == "\u3000\u3000" else x , content)))
+        contents.append(content)
+
+    item["content"] = "\n".join(contents) 
+
+    # 插入经文
+    row = db.select_one("SELECT * FROM `book_article` WHERE `chapter_id`=%s and `title`=%s", (volume_id, item["title"]))
+    if row is not None:
+        print("{0} 经文已存在，无法插入！".format(item["title"]))
         redis.sadd(PROCESSED_URLS, url) 
-        print("此知识点没有题目")
-        return
-
-    items = [] 
-
-    qhtml = html.xpath("//div[@class='dati']")[0]
-    contents = qhtml.xpath("./b/text()") # 题目正文
-    selects = qhtml.xpath("./ul") # 题目选项
-    answers = qhtml.xpath("./div[@class='answer']") # 答案选项
-    
-    if len(selects) != number or len(contents) != number or len(answers) != number:
-        redis.sadd(PROCESSED_URLS, url) 
-        print("此知识点内容有误，请手动处理")
-        redis.sadd("need_handle_urls", url) 
         return
     
-    for i in range(0, number):
-        # 提取选项 
-        select_list =  selects[i].xpath("./li/text()")
-        select_list = split_array(select_list, 2) 
-        select_list = [ " ".join(x).replace("\u2003\u2002", "") for x in select_list ]
-
-        # 提取答案
-        answer_text = list(filter(lambda x : x != "您选择:",  answers[i].xpath(".//text()"))) 
-
-        item = {
-            "title": qhtml.xpath("./div[@id={0}]/text()".format(i+1)),
-            "select": "\n".join(select_list),
-            "content": contents[i],
-            "answer": answer_text[0] + answer_text[1] + "\n".join(answer_text[2:]),
-            "order": i + 1,
-        }
-        items.append(item)
-
-    # 插入题目
-    for item in items:
-        if isinstance(item["title"], list):
-            item["title"] = item["title"].pop()
-        row = db.select_one("SELECT * FROM `tk_questions` WHERE `chapter_id`=%s and `title`=%s", (chapter_id, item["title"]))
-        if row is not None:
-            print("{0} 题目已存在，无法插入！".format(item["title"]))
-            continue
-        sql = """
-            INSERT INTO `tk_questions` ( `chapter_id`, `title`, `content`, `select`, `answer`, `order`) 
-            VALUES ( %s, %s, %s, %s, %s, %s)
-        """
-        data = (chapter_id, item["title"], item["content"], item["select"], item["answer"], item["order"])
-        db.insert(sql, data)
+    sql = """
+        INSERT INTO `book_article` ( `chapter_id`, `title`, `content`, `order`) 
+        VALUES ( %s, %s, %s, %s)
+    """
+    data = (volume_id, item["title"], item["content"], item["order"])
+    db.insert(sql, data)
         
     redis.sadd(PROCESSED_URLS, url) 
-    print("此知识点题目提取完毕")
-
+    print("此经文已插入完毕")
 
 
     
 if __name__ == "__main__":
     init_env()
 
-    # fetch_book()
+    fetch_book()
 
-    fetch_chapter("01 梵網經", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=59&id=490")
+    # fetch_chapter("01 梵網經", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=59&id=490")
+
+    # 经文名间有多个空格
+    # fetch_chapter("02   沙門果經", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=59&id=272")
+    
+    # 提取不到卷名
+    # fetch_chapter("02 天子相應", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=61&id=573")
+    # 正则匹配卷名失败
+    # fetch_chapter("30 相經", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=59&id=545")
+    # fetch_chapter("08 第八集 (部份經文)", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=62&id=338")
+    
+    # 提取经名和序号错误
+    # 有重复的请求
+    # fetch_chapter("12-2  因緣相應 （續）", "http://www.chilin.edu.hk/edu/report_section_detail.asp?section_id=61&id=278")
+
     
