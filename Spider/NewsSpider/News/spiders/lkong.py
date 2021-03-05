@@ -3,7 +3,7 @@
 
 import sys
 import scrapy
-from News.items import PostItem, ThreadItem, Project, UserItem
+from News.items import CommentItem, PostItem, ThreadItem, Project, UserItem
 from News.utils import *
 
 class LkongSpider(scrapy.Spider):
@@ -29,7 +29,6 @@ class LkongSpider(scrapy.Spider):
             yield thread
 
             yield scrapy.Request(item[0], callback=self.parse_thread, cb_kwargs=thread)     
-            return
             
     def parse_thread(self, response, **thread):
         """
@@ -57,14 +56,31 @@ class LkongSpider(scrapy.Spider):
             yield post
             
             yield scrapy.Request(post["post_path"], callback=self.parse_post, cb_kwargs=post)
-        return
         
         # 解析下一页的帖子
         next_url = response.css(".nxt::attr(href)").get()
-        yield scrapy.Request(next_url, callback=self.parse_thread, cb_kwargs=thread)
+        if next_url is not None:
+            yield scrapy.Request(next_url, callback=self.parse_thread, cb_kwargs=thread)
         
     def parse_post(self, response, **post):
         """
         解析帖子
         """
-        pass
+        comments = response.xpath(r"//div[re:test(@id, 'post_\d+')]")
+        
+        for item in comments:
+            contents = list(filter(lambda item: not item.isspace(), item.css(".t_f *::text").getall()))
+            content = "\n".join(contents)
+
+            comment = CommentItem()
+            comment["post_id"] = post["post_id"]
+            comment["comment_user"] = item.css(".authi font::text").get()
+            comment["comment_content"] = content
+            
+            yield comment
+            
+        # 解析帖子的下一页
+        next_url = response.css(".nxt::attr(href)").get()
+        if next_url is not None:
+            yield scrapy.Request(next_url, callback=self.parse_post, cb_kwargs=post)
+        

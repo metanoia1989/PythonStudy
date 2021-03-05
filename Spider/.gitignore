@@ -6,3 +6,5 @@ Pipfile.lock
 .htaccess
 .user.ini
 .well-known/
+
+.scrapy/
