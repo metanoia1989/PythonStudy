@@ -10,6 +10,7 @@ import sys
 import docx
 import re
 import json
+import xlwt
 
 curr_dir = os.path.dirname(os.path.realpath(__file__))
 docx_file = os.path.join(curr_dir, "测试试卷.docx")
@@ -38,22 +39,20 @@ def extract_choice(text):
     """
     提取选择题
     """
-    # regex = "(（\s?)([A-Z]+)(\s?）)"
-    # regex = "(（\s?)([A-Z]+)(\s?）)"
-    regex = "([（|\(]\s?)([A-Z]+)(\s?[）|\)])"
+    regex = "([（\(]\s*)([A-Z]+)(\s*[）\)])"
     result = re.search(regex, text)
     if result is None:
         return (None, None)
     answer = result.group(2)
     text = re.sub(regex, r"\1\3", text)
-    text = re.sub("^\s?\d+\.\s?", "", text).rstrip()
+    text = re.sub("^\s*\d+\.\s*", "", text).rstrip()
     return (text, answer)
 
 def isMultipleSelector(text):
     """
     文本是否包含多个选项
     """
-    regex = r"(A|B|C|D|E|F|G|H)\s+\w+"
+    regex = r"(A|B|C|D|E|F|G|H)\s?\w+"
     results = re.findall(regex, text) 
     if len(results) > 3:
         return True
@@ -63,7 +62,7 @@ def isMultipleSelector(text):
     return len(results) > 3
     
 def extractMultipleSelector(text):
-    regex = r"[A|B|C|D|E|F|G|H]\s\w+"
+    regex = r"[A|B|C|D|E|F|G|H]\s?\w+"
     results = re.findall(regex, text) 
     if len(results) > 3:
         return results
@@ -72,6 +71,42 @@ def extractMultipleSelector(text):
     results = re.findall(regex, text)
     return results
     
+
+def export_excel(boxs):
+    excel = xlwt.Workbook()
+    sheet = excel.add_sheet("Sheet1") 
+    headers = [
+        "序号",	"考题标题", "考题类型", "考题答案", 	
+        "选项1", "选项2", "选项3",  "选项4", "选项5"
+    ]
+    
+    # 写标题行
+    row_header = sheet.row(0)
+    for i in range(len(headers)):
+        row_header.write(i, headers[i]) 
+
+    number = 1 # 序号
+    for questype, questions in boxs.items():
+        for question in questions:
+            row = sheet.row(number)
+            selects = question.get("selector", [])
+            if len(selects) < 5:
+                selects += [ "" for x in range(0, 5 - len(selects))]
+            item = [
+                number,
+                question["question"], # 考题标题
+                questype, # 考题类型 
+                question["answer"], # 考题答案
+                *selects, # 5个选项
+            ]
+            for cell in range(len(item)):
+                row.write(cell, item[cell])
+            
+            number += 1
+            
+    filename = "测试试卷.xlsx"
+    excel.save(filename)
+
 
 def analyze_document():
     doc = docx.Document(docx_file)
@@ -114,10 +149,18 @@ def analyze_document():
 
         # 提取单选题
         if questype == "单选题" or questype == "多选题":
+            if len(selector) > 3 and selectorStart: # 上一道题选项提取完毕
+                item["selector"] = selector
+                boxs[questype].append(item)
+                # 重置状态
+                selectorStart = False
+                item = None
+                selector = []
+
             if selectorStart: # 提取选项
                 # 一行包含多个选项，直接完成一道题目的提取
                 if isMultipleSelector(text):
-                    item["selector"] = extractMultipleSelector(text)
+                    item["selector"] =  extractMultipleSelector(text)
                     boxs[questype].append(item)
                     # 重置状态
                     selectorStart = False
@@ -125,17 +168,14 @@ def analyze_document():
                     selector = []
                     continue
                 else:
-                    selector.append(text.strip())
+                    if extractMultipleSelector(text) is not None:
+                        selector += extractMultipleSelector(text) 
+                    else:
+                        selector.append(text.strip())
                     
             else: # 提取题目表述
-                if len(selector) > 2 and selectorStart: # 上一道题选项提取完毕
-                    boxs[questype].append(item)
-                    # 重置状态
-                    selectorStart = False
-                    item = None
-                    selector = []
-                    
                 [ question, answer ] = extract_choice(text)
+                    
                 if question is not None or answer is not None:
                     item = {
                         "question": question,
@@ -149,6 +189,7 @@ def analyze_document():
     with open(curr_dir + "/result.json", "w", encoding="utf8") as f:
         json.dump(boxs, f, indent=4, ensure_ascii=False)
 
+    export_excel(boxs)
 
 def test_extract_type():
     texts = [
@@ -177,6 +218,8 @@ def text_is_multiple_selector():
         "A设置防火卷帘或防火幕等简易防火分隔物的上部	",
         "A SS50  B SS65  C SS100  D SS150",
         "A 200  B 50  C 150  D 100",
+        "A12  B 24  C 36  D 48",
+        "A地上式室外消火栓        B地下式室外消火栓"
     ] 
     for t in texts:
         result = isMultipleSelector(t)
@@ -184,6 +227,7 @@ def text_is_multiple_selector():
         print(extractMultipleSelector(t))
 
     print(extract_choice("职业需具备的特征有（  ABCDE   ）"))
+    print(extract_choice("12.灯具保养前，应确保系统保持主电源供电（ B ）h以上。"))
 
 
 def test_main():
