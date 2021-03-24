@@ -1,0 +1,5 @@
+python-dotenv
+pymysql
+
+weasyprint
+jinja2
