@@ -1,0 +1,8 @@
+python-dotenv
+pymysql
+redis
+lxml
+requests
+
+weasyprint
+jinja2

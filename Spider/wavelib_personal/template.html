@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微澜图书馆志愿者人才</title>
+    <style>
+        .volume {
+            /* border: solid 1px rgba(73, 165, 222, 0.5); */
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1),
+                -1px -1px 1px rgba(0, 0, 0, 0.1)
+            ;
+        }
+
+        .volumn-title {
+            border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+            padding-bottom: 10px;
+            width: 150px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="pages">
+        {% for item in items %}
+        <div class="volume">
+            <div class="volume-hader">
+                <h1 class="volumn-title">{{ item.username }}</h1> 
+            </div>
+            <p>性别：{{ item.sex }}</p>
+            <p>地址：{{ item.province }} {{ item.city }} </p>
+            <p>来历：{{ item.how }}</p>
+            <p>注册时间：{{ item.addtime }}</p>
+            <div class="about">
+                自我介绍：{{ item.about }}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div> 
+</body>
+</html>
