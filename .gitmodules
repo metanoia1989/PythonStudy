@@ -1,0 +1,6 @@
+[submodule "TeamBuilding"]
+	path = TeamBuilding
+	url = https://github.com/metanoia1989/TeamBuilding
+[submodule "scrapyStudy"]
+	path = scrapyStudy
+	url = https://github.com/metanoia1989/scrapyStudy
