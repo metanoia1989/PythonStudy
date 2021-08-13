@@ -66,9 +66,15 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'VintageEeroticaForum.pipelines.VintageeeroticaforumPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'VintageEeroticaForum.pipelines.DownloadImagesPipeline': 1,
+   'VintageEeroticaForum.pipelines.PronStartItemPipeline': 5,
+}
+FILES_STORE='images'
+IMAGES_STORE='images'
+IMAGES_EXPIRES = 90  #90天内抓取的都不会被重抓
+CONCURRENT_REQUESTS = 250
+DOWNLOAD_DELAY = 2
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

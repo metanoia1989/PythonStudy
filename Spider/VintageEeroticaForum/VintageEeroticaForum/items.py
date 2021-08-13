@@ -10,3 +10,9 @@ class PornStartItem(scrapy.Item):
     # define the fields for your item here like:
     name = scrapy.Field()
     link = scrapy.Field()
+
+class ImgItem(scrapy.Item):
+    image_urls = scrapy.Field()
+    images = scrapy.Field()
+    image_paths = scrapy.Field()
+    pornName = scrapy.Field()
